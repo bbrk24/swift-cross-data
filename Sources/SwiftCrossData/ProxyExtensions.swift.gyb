@@ -1,0 +1,96 @@
+%{
+  integer_types = ['Int16', 'Int32', 'Int64']
+  real_types = ['Float', 'Double']
+  numeric_types = integer_types + real_types
+
+  real_unary_functions = ['ceiling', 'exp', 'floor', 'ln', 'log', 'log2', 'sqrt', 'trunc']
+
+  integer_operators = [('%', 'modulus:by:'), ('&', 'bitwiseAnd:with:'), ('|', 'bitwiseOr:with:')]
+  bitshift_operators = [('<<', 'leftshift:by:'), ('>>', 'rightshift:by:')]
+  numeric_operators = ['*', '/', '+', '-']
+  comparison_operators = ['<', '>', '<=', '>=']
+}%
+
+% for type in real_types:
+  extension ExpressionProxy where T == ${type} {
+    % for function in real_unary_functions:
+      public func ${function}() -> ExpressionProxy<${type}> {
+        .init(expression: .functionCall(functionName: "${function}", arguments: [self.expression]))
+      }
+    % end
+  }
+% end
+
+% for type in integer_types:
+  extension ExpressionProxy where T == ${type} {
+    % for other_type in integer_types:
+      % for (operator, core_data_function) in bitshift_operators:
+        public static func ${operator} (lhs: ExpressionProxy<${type}>, rhs: ExpressionProxy<${other_type}>) -> ExpressionProxy<${type}> {
+          #if canImport(CoreData)
+            .init(expression: .functionCall(functionName: "${core_data_function}", arguments: [lhs.expression, rhs.expression]))
+          #else
+            .init(expression: .binaryOperator(operation: "${operator}", lhs: lhs.expression, rhs: rhs.expression))
+          #endif
+        }
+        public static func ${operator} (lhs: ExpressionProxy<${type}>, rhs: ${other_type}) -> ExpressionProxy<${type}> {
+          lhs ${operator} ExpressionProxy<${other_type}>(rhs)
+        }
+        public static func ${operator} (lhs: ${type}, rhs: ExpressionProxy<${other_type}>) -> ExpressionProxy<${type}> {
+          ExpressionProxy(lhs) ${operator} rhs
+        }
+      % end
+    % end
+
+    % for (operator, core_data_function) in integer_operators:
+      public static func ${operator} (lhs: ExpressionProxy<${type}>, rhs: ExpressionProxy<${type}>) -> ExpressionProxy<${type}> {
+        #if canImport(CoreData)
+          .init(expression: .functionCall(functionName: "${core_data_function}", arguments: [lhs.expression, rhs.expression]))
+        #else
+          .init(expression: .binaryOperator(operation: "${operator}", lhs: lhs.expression, rhs: rhs.expression))
+        #endif
+      }
+      public static func ${operator} (lhs: ExpressionProxy<${type}>, rhs: ${type}) -> ExpressionProxy<${type}> {
+        lhs ${operator} ExpressionProxy(rhs)
+      }
+      public static func ${operator} (lhs: ${type}, rhs: ExpressionProxy<${type}>) -> ExpressionProxy<${type}> {
+        ExpressionProxy(lhs) ${operator} rhs
+      }
+    % end
+  }
+% end
+
+% for type in numeric_types:
+  extension ExpressionProxy where T == ${type} {
+    public func abs() -> ExpressionProxy<${type}> {
+      .init(expression: .functionCall(functionName: "abs", arguments: [self.expression]))
+    }
+
+    public static prefix func - (operand: ExpressionProxy<${type}>) -> ExpressionProxy<${type}> {
+      .init(expression: .unaryOperator(operation: "-", expression: operand.expression))
+    }
+
+    % for operator in numeric_operators:
+      public static func ${operator} (lhs: ExpressionProxy<${type}>, rhs: ExpressionProxy<${type}>) -> ExpressionProxy<${type}> {
+        .init(expression: .binaryOperator(operation: "${operator}", lhs: lhs.expression, rhs: rhs.expression))
+      }
+      public static func ${operator} (lhs: ExpressionProxy<${type}>, rhs: ${type}) -> ExpressionProxy<${type}> {
+        lhs ${operator} ExpressionProxy(rhs)
+      }
+      public static func ${operator} (lhs: ${type}, rhs: ExpressionProxy<${type}>) -> ExpressionProxy<${type}> {
+        ExpressionProxy(lhs) ${operator} rhs
+      }
+    % end
+
+    % for operator in comparison_operators:
+      public static func ${operator} (lhs: ExpressionProxy<${type}>, rhs: ExpressionProxy<${type}>) -> ExpressionProxy<Bool> {
+        .init(expression: .binaryOperator(operation: "${operator}", lhs: lhs.expression, rhs: rhs.expression))
+      }
+      public static func ${operator} (lhs: ExpressionProxy<${type}>, rhs: ${type}) -> ExpressionProxy<Bool> {
+        lhs ${operator} ExpressionProxy(rhs)
+      }
+      public static func ${operator} (lhs: ${type}, rhs: ExpressionProxy<${type}>) -> ExpressionProxy<Bool> {
+        ExpressionProxy(lhs) ${operator} rhs
+      }
+    % end
+  }
+% end
