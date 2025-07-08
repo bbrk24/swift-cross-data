@@ -144,6 +144,7 @@ public struct QueryWrapper<T: Model> {
                 output += innerSql
                 sqlArgs += innerArgs
             }
+            output += ")"
 
             return (output, sqlArgs)
         case .cast(let expression, let sourceType, let destinationType):

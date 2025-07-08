@@ -58,8 +58,8 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
 
                 """
                 #if !canImport(CoreData)
-                public init(row: Row) throws {
-                    self.rowid = try decodeRowValue(row, "rowid")
+                public init(row: SwiftCrossData.Row) throws {
+                    self.rowid = try SwiftCrossData.decodeRowValue(row, "rowid")
                     \(raw: initStatements)
                 }
                 #endif

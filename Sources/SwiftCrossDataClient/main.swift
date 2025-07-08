@@ -8,7 +8,7 @@ struct Foo {
 let db = try! Database(models: [Foo.self], dbFileName: "./db.sqlite")
 
 let models = try! await db.select(from: Foo.self, where: { foo in
-    foo.name == "child"
+    foo.name.count > 5
 }).collect()
 
 print(models)
