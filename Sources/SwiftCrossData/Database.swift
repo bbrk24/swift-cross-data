@@ -107,9 +107,9 @@ public struct SortItem<T: Model> {
 }
 
 public struct QueryWrapper<T: Model> {
-    unowned var db: Database
-    var sortFields: [SortItem<T>]
-    var expression: SqlExpression
+    let db: Database
+    let sortFields: [SortItem<T>]
+    let expression: SqlExpression
 
     private static func compile(expression: SqlExpression) -> (String, [Binding?]) {
         switch expression {
@@ -171,7 +171,18 @@ public struct QueryWrapper<T: Model> {
     }
 
     public func count() async throws -> Int64 {
-        fatalError("TODO")
+        let (whereClause, arguments) = Self.compile(expression: self.expression)
+        
+        let quotedTableName = SQLite.Expression<Int>(T.getTableName()).description
+
+        let queryString = "SELECT COUNT(*) FROM \(quotedTableName) WHERE \(whereClause);"
+
+        return try await db.connectionWrapper.withConnection { [queryString] (conn) in
+            let query = try conn.prepare(queryString, arguments)
+
+            _ = try query.step()
+            return query.row[0]
+        }
     }
 
     public func collect<C: RangeReplaceableCollection>(as _: C.Type) async throws -> C
