@@ -7,10 +7,10 @@ struct Foo {
 
 let db = try! Database(models: [Foo.self], dbFileName: "./db.sqlite")
 
-print(try! await db.select(from: Foo.self) { _ in ExpressionProxy(true) }.count())
+try! await db.insert(Foo(name: "new model"))
 
-let models = try! await db.select(from: Foo.self, where: { foo in
-    foo.name.count > 5
+let models = try! await db.select(from: Foo.self, where: { _ in
+    ExpressionProxy(true)
 }).collect()
 
 print(models)

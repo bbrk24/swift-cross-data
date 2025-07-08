@@ -90,6 +90,52 @@ public final class Database: Sendable {
             expression: predicate(.init()).expression
         )
     }
+
+    public func insert<T: Model>(_ values: T...) async throws {
+        return try await insert(values)
+    }
+
+    public func insert<C: Collection>(_ values: sending C) async throws
+    where C.Element: Model {
+        #if canImport(CoreData)
+            fatalError("TODO")
+        #else
+            try await connectionWrapper.withConnection { [values] (conn) in
+                for value in values {
+                    func createSetter<T: ColumnType>(
+                        keyPath: PartialKeyPath<C.Element>,
+                        columnType: T.Type,
+                        columnName: String
+                    ) -> Setter {
+                        let keyPath = keyPath as! WritableKeyPath<C.Element, T>
+                        let sqliteValue = value[keyPath: keyPath].sqliteValue
+
+                        return switch sqliteValue {
+                        case .integer(let i):
+                            SQLite.Expression(columnName) <- i
+                        case .real(let r):
+                            SQLite.Expression(columnName) <- r
+                        case .text(let s):
+                            SQLite.Expression(columnName) <- s
+                        case .blob(let b):
+                            SQLite.Expression(columnName) <- b
+                        case .null:
+                            SQLite.Expression<Int?>(columnName) <- nil
+                        }
+                    }
+
+                    let statement = Table(C.Element.getTableName()).insert(
+                        or: .abort,
+                        C.Element.properties.map {
+                            createSetter(keyPath: $0.keyPath, columnType: $0.columnType, columnName: $0.columnName)
+                        }
+                    )
+
+                    try conn.run(statement)
+                }
+            }
+        #endif
+    } 
 }
 
 public enum SortDirection {
@@ -111,6 +157,16 @@ public struct QueryWrapper<T: Model> {
     let sortFields: [SortItem<T>]
     let expression: SqlExpression
 
+#if canImport(CoreData)
+    public func count() async throws -> Int64 {
+        fatalError("TODO")
+    }
+
+    public func collect<C: RangeReplaceableCollection>(as _: C.Type) async throws -> C
+    where C.Element == T {
+        fatalError("TODO")
+    }
+#else
     private static func compile(expression: SqlExpression) -> (String, [Binding?]) {
         switch expression {
         case .column(let name):
@@ -223,6 +279,7 @@ public struct QueryWrapper<T: Model> {
             return results
         }
     }
+#endif
 
     public func collect() async throws -> [T] {
         try await collect(as: Array.self)
