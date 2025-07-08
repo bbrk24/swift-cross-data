@@ -306,11 +306,11 @@
 
         public static func decode(sqliteValue: SqliteValue) -> Wrapped?? {
             if case .null = sqliteValue {
-                return .none
+                return .some(.none)
             } else if let wrapped = Wrapped.decode(sqliteValue: sqliteValue) {
-                return .some(wrapped)
+                return .some(.some(wrapped))
             } else {
-                return nil
+                return .none
             }
         }
     }
