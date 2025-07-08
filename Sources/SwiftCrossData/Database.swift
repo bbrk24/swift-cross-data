@@ -194,7 +194,7 @@ public struct QueryWrapper<T: Model> {
                 let (lhsInner, lhsArgs) = compile(expression: lhs)
                 let (rhsInner, rhsArgs) = compile(expression: rhs)
 
-                return ("\(lhsInner) \(operation) \(rhsInner)", lhsArgs + rhsArgs)
+                return ("(\(lhsInner) \(operation) \(rhsInner))", lhsArgs + rhsArgs)
             case .functionCall(let functionName, let arguments):
                 var output = functionName + "("
                 var sqlArgs: [Binding?] = []
