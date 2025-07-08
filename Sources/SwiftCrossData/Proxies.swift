@@ -9,7 +9,11 @@ enum SqlExpression {
         rhs: SqlExpression
     )
     case functionCall(functionName: String, arguments: [SqlExpression])
-    indirect case cast(expression: SqlExpression, sourceType: ColumnType.Type, destinationType: ColumnType.Type)
+    indirect case cast(
+        expression: SqlExpression,
+        sourceType: ColumnType.Type,
+        destinationType: ColumnType.Type
+    )
     case literal(value: any ColumnType)
 }
 
@@ -28,11 +32,29 @@ public struct ExpressionProxy<T: ColumnType> {
     }
 
     #if canImport(CoreData)
-        public static func == (lhs: ExpressionProxy<T>, rhs: ExpressionProxy<T>) -> ExpressionProxy<Bool> {
-            .init(expression: .binaryOperator(operation: "=", lhs: lhs.expression, rhs: rhs.expression))
+        public static func == (
+            lhs: ExpressionProxy<T>,
+            rhs: ExpressionProxy<T>
+        ) -> ExpressionProxy<Bool> {
+            .init(
+                expression: .binaryOperator(
+                    operation: "=",
+                    lhs: lhs.expression,
+                    rhs: rhs.expression
+                )
+            )
         }
-        public static func != (lhs: ExpressionProxy<T>, rhs: ExpressionProxy<T>) -> ExpressionProxy<Bool> {
-            .init(expression: .binaryOperator(operation: "!=", lhs: lhs.expression, rhs: rhs.expression))
+        public static func != (
+            lhs: ExpressionProxy<T>,
+            rhs: ExpressionProxy<T>
+        ) -> ExpressionProxy<Bool> {
+            .init(
+                expression: .binaryOperator(
+                    operation: "!=",
+                    lhs: lhs.expression,
+                    rhs: rhs.expression
+                )
+            )
         }
     #else
         public static func == <Wrapped: ColumnType>(
@@ -40,21 +62,51 @@ public struct ExpressionProxy<T: ColumnType> {
             rhs: _OptionalNilComparisonType
         ) -> ExpressionProxy<Bool>
         where T == Wrapped? {
-            .init(expression: .unaryOperator(operation: " ISNULL", expression: lhs.expression, isPrefix: false))
+            .init(
+                expression: .unaryOperator(
+                    operation: " ISNULL",
+                    expression: lhs.expression,
+                    isPrefix: false
+                )
+            )
         }
         public static func != <Wrapped: ColumnType>(
             lhs: ExpressionProxy<Wrapped?>,
             rhs: _OptionalNilComparisonType
         ) -> ExpressionProxy<Bool>
         where T == Wrapped? {
-            .init(expression: .unaryOperator(operation: " NOT NULL", expression: lhs.expression, isPrefix: false))
+            .init(
+                expression: .unaryOperator(
+                    operation: " NOT NULL",
+                    expression: lhs.expression,
+                    isPrefix: false
+                )
+            )
         }
 
-        public static func == (lhs: ExpressionProxy<T>, rhs: ExpressionProxy<T>) -> ExpressionProxy<Bool> {
-            .init(expression: .binaryOperator(operation: "IS NOT DISTINCT FROM", lhs: lhs.expression, rhs: rhs.expression))
+        public static func == (
+            lhs: ExpressionProxy<T>,
+            rhs: ExpressionProxy<T>
+        ) -> ExpressionProxy<Bool> {
+            .init(
+                expression: .binaryOperator(
+                    operation: "IS NOT DISTINCT FROM",
+                    lhs: lhs.expression,
+                    rhs: rhs.expression
+                )
+            )
         }
-        public static func != (lhs: ExpressionProxy<T>, rhs: ExpressionProxy<T>) -> ExpressionProxy<Bool> {
-            .init(expression: .binaryOperator(operation: "IS DISTINCT FROM", lhs: lhs.expression, rhs: rhs.expression))
+        public static func != (
+            lhs: ExpressionProxy<T>,
+            rhs: ExpressionProxy<T>
+        ) -> ExpressionProxy<Bool> {
+            .init(
+                expression: .binaryOperator(
+                    operation: "IS DISTINCT FROM",
+                    lhs: lhs.expression,
+                    rhs: rhs.expression
+                )
+            )
         }
     #endif
 
@@ -72,7 +124,13 @@ public struct ExpressionProxy<T: ColumnType> {
     }
 
     public func cast<U>(to _: U.Type = U.self) -> ExpressionProxy<U> {
-        .init(expression: .cast(expression: self.expression, sourceType: T.self, destinationType: U.self))
+        .init(
+            expression: .cast(
+                expression: self.expression,
+                sourceType: T.self,
+                destinationType: U.self
+            )
+        )
     }
 }
 
@@ -84,7 +142,9 @@ extension ExpressionProxy where T == String {
             let functionName = "LOWER"
         #endif
 
-        return .init(expression: .functionCall(functionName: functionName, arguments: [self.expression]))
+        return .init(
+            expression: .functionCall(functionName: functionName, arguments: [self.expression])
+        )
     }
 
     public func uppercased() -> ExpressionProxy<String> {
@@ -94,7 +154,9 @@ extension ExpressionProxy where T == String {
             let functionName = "UPPER"
         #endif
 
-        return .init(expression: .functionCall(functionName: functionName, arguments: [self.expression]))
+        return .init(
+            expression: .functionCall(functionName: functionName, arguments: [self.expression])
+        )
     }
 
     public func matchesGlob(_ template: ExpressionProxy<String>) -> ExpressionProxy<Bool> {
@@ -103,8 +165,14 @@ extension ExpressionProxy where T == String {
         #else
             let globOperator = "GLOB"
         #endif
-        
-        return .init(expression: .binaryOperator(operation: globOperator, lhs: self.expression, rhs: template.expression))
+
+        return .init(
+            expression: .binaryOperator(
+                operation: globOperator,
+                lhs: self.expression,
+                rhs: template.expression
+            )
+        )
     }
     public func matchesGlob(_ template: String) -> ExpressionProxy<Bool> {
         matchesGlob(ExpressionProxy(template))
@@ -135,8 +203,13 @@ extension ExpressionProxy where T == Bool {
         .init(expression: .unaryOperator(operation: "NOT ", expression: operand.expression))
     }
 
-    public static func && (lhs: ExpressionProxy<Bool>, rhs: ExpressionProxy<Bool>) -> ExpressionProxy<Bool> {
-        .init(expression: .binaryOperator(operation: "AND", lhs: lhs.expression, rhs: rhs.expression))
+    public static func && (
+        lhs: ExpressionProxy<Bool>,
+        rhs: ExpressionProxy<Bool>
+    ) -> ExpressionProxy<Bool> {
+        .init(
+            expression: .binaryOperator(operation: "AND", lhs: lhs.expression, rhs: rhs.expression)
+        )
     }
     public static func && (lhs: ExpressionProxy<Bool>, rhs: Bool) -> ExpressionProxy<Bool> {
         if rhs {
@@ -152,9 +225,14 @@ extension ExpressionProxy where T == Bool {
             ExpressionProxy(false)
         }
     }
-    
-    public static func || (lhs: ExpressionProxy<Bool>, rhs: ExpressionProxy<Bool>) -> ExpressionProxy<Bool> {
-        .init(expression: .binaryOperator(operation: "OR", lhs: lhs.expression, rhs: rhs.expression))
+
+    public static func || (
+        lhs: ExpressionProxy<Bool>,
+        rhs: ExpressionProxy<Bool>
+    ) -> ExpressionProxy<Bool> {
+        .init(
+            expression: .binaryOperator(operation: "OR", lhs: lhs.expression, rhs: rhs.expression)
+        )
     }
     public static func || (lhs: ExpressionProxy<Bool>, rhs: Bool) -> ExpressionProxy<Bool> {
         if rhs {
@@ -174,7 +252,9 @@ extension ExpressionProxy where T == Bool {
 
 @dynamicMemberLookup
 public struct TableProxy<M: Model> {
-    public subscript<C: ColumnType>(dynamicMember keyPath: WritableKeyPath<M, C>) -> ExpressionProxy<C> {
+    public subscript<C: ColumnType>(dynamicMember keyPath: WritableKeyPath<M, C>)
+        -> ExpressionProxy<C>
+    {
         get {
             guard let columnName = M.getColumnName(forKeyPath: keyPath) else {
                 preconditionFailure("Could not find column name for key path \(keyPath)")

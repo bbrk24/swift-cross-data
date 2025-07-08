@@ -18,14 +18,15 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         let str = Struct(declaration)
 
         let properties = str.properties.filter(\.isStored)
-        
+
         var propertyElements = ""
         var initStatements = ""
 
         for property in properties {
             let columnName = property.identifier
 
-            initStatements += "self.\(property.identifier) = try decodeRowValue(row, \"\(columnName)\")\n"
+            initStatements +=
+                "self.\(property.identifier) = try decodeRowValue(row, \"\(columnName)\")\n"
 
             if let initialValue = property.initialValue {
                 propertyElements += #"""
@@ -44,11 +45,13 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                     """#
             }
         }
-        
+
         return [
             ExtensionDeclSyntax(
                 extendedType: type,
-                inheritanceClause: .init(inheritedTypes: [InheritedTypeSyntax(type: TypeSyntax("SwiftCrossData.Model"))])
+                inheritanceClause: .init(inheritedTypes: [
+                    InheritedTypeSyntax(type: TypeSyntax("SwiftCrossData.Model"))
+                ])
             ) {
                 """
                 public static var properties: [SwiftCrossData.ModelProperty<Self>] {
@@ -82,7 +85,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
             """
         ]
     }
-    
+
     public static func expansion(
         of node: SwiftSyntax.AttributeSyntax,
         providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
@@ -95,26 +98,29 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         let str = Struct(declaration)
 
         let properties = str.properties.filter(\.isStored)
-        
+
         var propertyElements = ""
         for property in properties {
             guard let type = property.type else {
-                context.diagnose(Diagnostic(
-                    node: property._syntax,
-                    message: Message(
-                        message: "Could not determine property type.",
-                        diagnosticID: MessageID(domain: errorDomain, id: "MissingPropertyType"),
-                        severity: .error
+                context.diagnose(
+                    Diagnostic(
+                        node: property._syntax,
+                        message: Message(
+                            message: "Could not determine property type.",
+                            diagnosticID: MessageID(domain: errorDomain, id: "MissingPropertyType"),
+                            severity: .error
+                        )
                     )
-                ))
+                )
                 continue
             }
-            propertyElements += "\n@NSManaged var \(property.identifier): \(type.normalizedDescription)"
+            propertyElements +=
+                "\n@NSManaged var \(property.identifier): \(type.normalizedDescription)"
             if let initialValue = property.initialValue {
                 propertyElements += " = \(initialValue._syntax.description)"
             }
         }
-        
+
         return [
             """
             #if canImport(CoreData)

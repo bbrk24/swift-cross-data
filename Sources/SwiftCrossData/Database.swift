@@ -1,33 +1,35 @@
 #if canImport(CoreData)
-@_exported import CoreData
+    @_exported import CoreData
 #else
-import SQLite
-import Foundation
+    import SQLite
+    import Foundation
 
-actor ConnectionWrapper {
-    private let connection: Connection
+    actor ConnectionWrapper {
+        private let connection: Connection
 
-    init(connection: sending Connection) {
-        self.connection = connection
+        init(connection: sending Connection) {
+            self.connection = connection
+        }
+
+        func withConnection<T, E: Error>(
+            _ body: @Sendable (borrowing Connection) throws(E) -> T
+        ) throws(E) -> T {
+            return try body(connection)
+        }
     }
 
-    func withConnection<T, E: Error>(_ body: @Sendable (Connection) throws(E) -> T) throws(E) -> T {
-        return try body(connection)
-    }
-}
-
-func createColumn(type: SqliteTypeName, name: String, builder t: TableBuilder) {
-    switch type {
-    case .integer:
-        t.column(SQLite.Expression<Int64>(name))
-    case .real:
-        t.column(SQLite.Expression<Double>(name))
-    case .text:
-        t.column(SQLite.Expression<String>(name))
-    case .blob:
-        t.column(SQLite.Expression<Data>(name))
-    case .null(let inner):
-        switch inner {
+    func createColumn(type: SqliteTypeName, name: String, builder t: TableBuilder) {
+        switch type {
+        case .integer:
+            t.column(SQLite.Expression<Int64>(name))
+        case .real:
+            t.column(SQLite.Expression<Double>(name))
+        case .text:
+            t.column(SQLite.Expression<String>(name))
+        case .blob:
+            t.column(SQLite.Expression<Data>(name))
+        case .null(let inner):
+            switch inner {
             case .integer:
                 t.column(SQLite.Expression<Int64?>(name))
             case .real:
@@ -38,9 +40,9 @@ func createColumn(type: SqliteTypeName, name: String, builder t: TableBuilder) {
                 t.column(SQLite.Expression<Data?>(name))
             case .null(_):
                 createColumn(type: inner, name: name, builder: t)
+            }
         }
     }
-}
 #endif
 
 public final class Database: Sendable {
@@ -66,7 +68,11 @@ public final class Database: Sendable {
 
                         func propertyIterate(_ model: (some Model).Type) {
                             for property in model.properties {
-                                createColumn(type: property.columnType.sqliteTypeName, name: property.columnName, builder: t)
+                                createColumn(
+                                    type: property.columnType.sqliteTypeName,
+                                    name: property.columnName,
+                                    builder: t
+                                )
                             }
                         }
 
@@ -124,18 +130,23 @@ public final class Database: Sendable {
                         }
                     }
 
-                    let statement = Table(C.Element.getTableName()).insert(
-                        or: .abort,
-                        C.Element.properties.map {
-                            createSetter(keyPath: $0.keyPath, columnType: $0.columnType, columnName: $0.columnName)
-                        }
-                    )
+                    let statement = Table(C.Element.getTableName())
+                        .insert(
+                            or: .abort,
+                            C.Element.properties.map {
+                                createSetter(
+                                    keyPath: $0.keyPath,
+                                    columnType: $0.columnType,
+                                    columnName: $0.columnName
+                                )
+                            }
+                        )
 
                     try conn.run(statement)
                 }
             }
         #endif
-    } 
+    }
 }
 
 public enum SortDirection {
@@ -157,129 +168,132 @@ public struct QueryWrapper<T: Model> {
     let sortFields: [SortItem<T>]
     let expression: SqlExpression
 
-#if canImport(CoreData)
-    public func count() async throws -> Int64 {
-        fatalError("TODO")
-    }
+    #if canImport(CoreData)
+        public func count() async throws -> Int64 {
+            fatalError("TODO")
+        }
 
-    public func collect<C: RangeReplaceableCollection>(as _: C.Type) async throws -> C
-    where C.Element == T {
-        fatalError("TODO")
-    }
-#else
-    private static func compile(expression: SqlExpression) -> (String, [Binding?]) {
-        switch expression {
-        case .column(let name):
-            // generic argument doesn't matter
-            return (SQLite.Expression<Int>(name).description, [])
-        case .unaryOperator(let operation, let expression, let isPrefix):
-            let (inner, args) = compile(expression: expression)
-            if isPrefix {
-                return (operation + inner, args)
-            } else {
-                return (inner + operation, args)
-            }
-        case .binaryOperator(let operation, let lhs, let rhs):
-            let (lhsInner, lhsArgs) = compile(expression: lhs)
-            let (rhsInner, rhsArgs) = compile(expression: rhs)
-
-            return ("\(lhsInner) \(operation) \(rhsInner)", lhsArgs + rhsArgs)
-        case .functionCall(let functionName, let arguments):
-            var output = functionName + "("
-            var sqlArgs: [Binding?] = []
-
-            var isFirst = true
-            for argument in arguments {
-                if isFirst {
-                    isFirst = false   
-                } else {
-                    output += ", "
-                }
-
-                let (innerSql, innerArgs) = compile(expression: argument)
-                output += innerSql
-                sqlArgs += innerArgs
-            }
-            output += ")"
-
-            return (output, sqlArgs)
-        case .cast(let expression, let sourceType, let destinationType):
-            if sourceType.sqliteTypeName == destinationType.sqliteTypeName {
-                return compile(expression: expression)
-            } else {
+        public func collect<C: RangeReplaceableCollection>(as _: C.Type) async throws -> C
+        where C.Element == T {
+            fatalError("TODO")
+        }
+    #else
+        private static func compile(expression: SqlExpression) -> (String, [Binding?]) {
+            switch expression {
+            case .column(let name):
+                // generic argument doesn't matter
+                return (SQLite.Expression<Int>(name).description, [])
+            case .unaryOperator(let operation, let expression, let isPrefix):
                 let (inner, args) = compile(expression: expression)
-                return ("CAST(\(inner) AS \(destinationType.sqliteTypeName.castTypeString))", args)
-            }
-        case .literal(let value):
-            switch value.sqliteValue {
-            case .integer(let i):
-                return ("?", [i])
-            case .real(let r):
-                return ("?", [r])
-            case .text(let s):
-                return ("?", [s])
-            case .blob(let b):
-                return ("?", [b.datatypeValue])
-            case .null:
-                return ("NULL", [])
+                if isPrefix {
+                    return (operation + inner, args)
+                } else {
+                    return (inner + operation, args)
+                }
+            case .binaryOperator(let operation, let lhs, let rhs):
+                let (lhsInner, lhsArgs) = compile(expression: lhs)
+                let (rhsInner, rhsArgs) = compile(expression: rhs)
+
+                return ("\(lhsInner) \(operation) \(rhsInner)", lhsArgs + rhsArgs)
+            case .functionCall(let functionName, let arguments):
+                var output = functionName + "("
+                var sqlArgs: [Binding?] = []
+
+                var isFirst = true
+                for argument in arguments {
+                    if isFirst {
+                        isFirst = false
+                    } else {
+                        output += ", "
+                    }
+
+                    let (innerSql, innerArgs) = compile(expression: argument)
+                    output += innerSql
+                    sqlArgs += innerArgs
+                }
+                output += ")"
+
+                return (output, sqlArgs)
+            case .cast(let expression, let sourceType, let destinationType):
+                if sourceType.sqliteTypeName == destinationType.sqliteTypeName {
+                    return compile(expression: expression)
+                } else {
+                    let (inner, args) = compile(expression: expression)
+                    return (
+                        "CAST(\(inner) AS \(destinationType.sqliteTypeName.castTypeString))", args
+                    )
+                }
+            case .literal(let value):
+                switch value.sqliteValue {
+                case .integer(let i):
+                    return ("?", [i])
+                case .real(let r):
+                    return ("?", [r])
+                case .text(let s):
+                    return ("?", [s])
+                case .blob(let b):
+                    return ("?", [b.datatypeValue])
+                case .null:
+                    return ("NULL", [])
+                }
             }
         }
-    }
 
-    public func count() async throws -> Int64 {
-        let (whereClause, arguments) = Self.compile(expression: self.expression)
-        
-        let quotedTableName = SQLite.Expression<Int>(T.getTableName()).description
+        public func count() async throws -> Int64 {
+            let (whereClause, arguments) = Self.compile(expression: self.expression)
 
-        let queryString = "SELECT COUNT(*) FROM \(quotedTableName) WHERE \(whereClause);"
+            let quotedTableName = SQLite.Expression<Int>(T.getTableName()).description
 
-        return try await db.connectionWrapper.withConnection { [queryString] (conn) in
-            let query = try conn.prepare(queryString, arguments)
+            let queryString = "SELECT COUNT(*) FROM \(quotedTableName) WHERE \(whereClause);"
 
-            _ = try query.step()
-            return query.row[0]
-        }
-    }
+            return try await db.connectionWrapper.withConnection { [queryString] (conn) in
+                let query = try conn.prepare(queryString, arguments)
 
-    public func collect<C: RangeReplaceableCollection>(as _: C.Type) async throws -> C
-    where C.Element == T {
-        let (whereClause, arguments) = Self.compile(expression: self.expression)
-        
-        // generic argument doesn't matter
-        let quotedTableName = SQLite.Expression<Int>(T.getTableName()).description
-
-        var queryString = "SELECT * FROM \(quotedTableName) WHERE \(whereClause) ORDER BY "
-
-        for field in sortFields {
-            guard let columnName = T.getColumnName(forKeyPath: field.keyPath) else {
-                preconditionFailure("Could not find column name for key path \(field.keyPath)")
+                _ = try query.step()
+                return query.row[0]
             }
+        }
 
-            let directionString =
-                switch field.direction {
-                case .asc:
-                    "ASC"
-                case .desc:
-                    "DESC"
+        public func collect<C: RangeReplaceableCollection>(as _: C.Type) async throws -> C
+        where C.Element == T {
+            let (whereClause, arguments) = Self.compile(expression: self.expression)
+
+            // generic argument doesn't matter
+            let quotedTableName = SQLite.Expression<Int>(T.getTableName()).description
+
+            var queryString = "SELECT * FROM \(quotedTableName) WHERE \(whereClause) ORDER BY "
+
+            for field in sortFields {
+                guard let columnName = T.getColumnName(forKeyPath: field.keyPath) else {
+                    preconditionFailure("Could not find column name for key path \(field.keyPath)")
                 }
 
-            queryString += "\(SQLite.Expression<Int>(columnName).description) \(directionString), "
-        }
-        queryString += "rowid;"
+                let directionString =
+                    switch field.direction {
+                    case .asc:
+                        "ASC"
+                    case .desc:
+                        "DESC"
+                    }
 
-        return try await db.connectionWrapper.withConnection { [queryString] (conn) in
-            let rows = try conn.prepareRowIterator(queryString, bindings: arguments)
-
-            var results = C.init()
-            
-            for row in IteratorSequence(rows) {
-                results.append(try T.init(row: row))
+                queryString +=
+                    "\(SQLite.Expression<Int>(columnName).description) \(directionString), "
             }
+            queryString += "rowid;"
 
-            return results
+            return try await db.connectionWrapper.withConnection { [queryString] (conn) in
+                let rows = try conn.prepareRowIterator(queryString, bindings: arguments)
+
+                var results = C.init()
+
+                for row in IteratorSequence(rows) {
+                    results.append(try T.init(row: row))
+                }
+
+                return results
+            }
         }
-    }
-#endif
+    #endif
 
     public func collect() async throws -> [T] {
         try await collect(as: Array.self)

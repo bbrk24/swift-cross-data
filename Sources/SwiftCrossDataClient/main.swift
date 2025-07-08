@@ -9,8 +9,13 @@ let db = try! Database(models: [Foo.self], dbFileName: "./db.sqlite")
 
 try! await db.insert(Foo(name: "new model"))
 
-let models = try! await db.select(from: Foo.self, where: { _ in
-    ExpressionProxy(true)
-}).collect()
+let models =
+    try! await db.select(
+        from: Foo.self,
+        where: { _ in
+            ExpressionProxy(true)
+        }
+    )
+    .collect()
 
 print(models)
