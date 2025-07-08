@@ -5,10 +5,10 @@ struct Foo {
     var name: String
 }
 
-let db = Database(models: [Foo.self], dbFileName: "./db.sqlite")
+let db = try! Database(models: [Foo.self], dbFileName: "./db.sqlite")
 
-let models = await db.select(from: Foo.self, where: { foo in
-    foo.name.matchesGlob("*bar*")
+let models = try! await db.select(from: Foo.self, where: { foo in
+    foo.name == "child"
 }).collect()
 
 print(models)

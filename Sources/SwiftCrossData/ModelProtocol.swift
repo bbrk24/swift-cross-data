@@ -1,7 +1,72 @@
+#if !canImport(CoreData)
+import SQLite
+import Foundation
+
+public typealias Row = SQLite.Row
+
+func decodeRowValue(row: Row, columnName: String, type: SqliteTypeName) throws -> SqliteValue {
+    switch type {
+    case .integer:
+        .integer(try row.get(SQLite.Expression<Int64>(columnName)))
+    case .real:
+        .real(try row.get(SQLite.Expression<Double>(columnName)))
+    case .text:
+        .text(try row.get(SQLite.Expression<String>(columnName)))
+    case .blob:
+        .blob(try row.get(SQLite.Expression<Data>(columnName)))
+    case .null(let inner):
+        switch inner {
+        case .integer:
+            if let value = try row.get(SQLite.Expression<Int64?>(columnName)) {
+                .integer(value)
+            } else {
+                .null
+            }
+        case .real:
+            if let value = try row.get(SQLite.Expression<Double?>(columnName)) {
+                .real(value)
+            } else {
+                .null
+            }
+        case .text:
+            if let value = try row.get(SQLite.Expression<String?>(columnName)) {
+                .text(value)
+            } else {
+                .null
+            }
+        case .blob:
+            if let value = try row.get(SQLite.Expression<Data?>(columnName)) {
+                .blob(value)
+            } else {
+                .null
+            }
+        case .null(_):
+            try decodeRowValue(row: row, columnName: columnName, type: inner)
+        }
+    }
+}
+
+public struct DecodingFailed: Error {
+    public var type: any ColumnType.Type
+    public var value: SqliteValue
+}
+
+public func decodeRowValue<T: ColumnType>(_ row: Row, _ columnName: String) throws -> T {
+    let value = try decodeRowValue(row: row, columnName: columnName, type: T.sqliteTypeName)
+    if let decoded = T.decode(sqliteValue: value) {
+        return decoded
+    } else {
+        throw DecodingFailed(type: T.self, value: value)
+    }
+}
+
+#endif
+
 public struct ModelProperty<T> {
-    public let keyPath: PartialKeyPath<T>
-    public let columnName: String
-    public let defaultValue: Any?
+    let keyPath: PartialKeyPath<T>
+    let columnName: String
+    let defaultValue: Any?
+    let columnType: any ColumnType.Type
     
     public init<PropertyType: ColumnType>(
         keyPath: WritableKeyPath<T, PropertyType>,
@@ -11,6 +76,7 @@ public struct ModelProperty<T> {
         self.keyPath = keyPath
         self.columnName = columnName
         self.defaultValue = defaultValue
+        self.columnType = PropertyType.self
     }
 }
 
@@ -33,6 +99,10 @@ public protocol Model {
 
     static func getIndexes() -> [ModelIndex<Self>]
     static func getTableName() -> String
+
+    #if !canImport(CoreData)
+    init(row: Row) throws
+    #endif
 }
 
 extension Model {

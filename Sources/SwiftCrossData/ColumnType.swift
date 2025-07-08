@@ -5,7 +5,6 @@ import CoreData
 public protocol ColumnType {
     static var attributeType: NSAttributeDescription.AttributeType { get }
     static var isOptional: Bool { get }
-    static var defaultValue: Self { get }
 }
 
 extension Int16: ColumnType {
@@ -89,10 +88,9 @@ extension Optional: ColumnType where Wrapped: ColumnType {
 }
 #else
 import Foundation
-import RegexBuilder
 
 public enum SqliteTypeName: Sendable, Equatable {
-    case integer, real, text, blob, any
+    case integer, real, text, blob
     indirect case null(SqliteTypeName)
 
     public static func notNull(_ type: SqliteTypeName) -> SqliteTypeName {
@@ -103,7 +101,7 @@ public enum SqliteTypeName: Sendable, Equatable {
         }
     }
 
-    var castTypeString: String? {
+    var castTypeString: String {
         switch self {
         case .integer:
             return "INTEGER"
@@ -113,40 +111,8 @@ public enum SqliteTypeName: Sendable, Equatable {
             return "TEXT"
         case .blob:
             return "NONE"
-        case .any:
-            return nil
         case .null(let inner):
             return inner.castTypeString
-        }
-    }
-
-    var columnTypeString: String {
-        switch self {
-        case .integer:
-            return "INT NOT NULL"
-        case .real:
-            return "REAL NOT NULL"
-        case .text:
-            return "TEXT NOT NULL"
-        case .blob:
-            return "BLOB NOT NULL"
-        case .any:
-            return "ANY NOT NULL"
-        case .null(let inner):
-            switch inner {
-            case .integer:
-                return "INT"
-            case .real:
-                return "REAL"
-            case .text:
-                return "TEXT"
-            case .blob:
-                return "BLOB"
-            case .any:
-                return "ANY"
-            case .null(_):
-                return inner.columnTypeString
-            }
         }
     }
 }
@@ -163,7 +129,6 @@ public protocol ColumnType {
     static var sqliteTypeName: SqliteTypeName { get }
     var sqliteValue: SqliteValue { get }
     static func decode(sqliteValue: SqliteValue) -> Self?
-    static var defaultValue: Self { get }
 }
 
 extension Int16: ColumnType {
@@ -350,49 +315,3 @@ extension Optional: ColumnType where Wrapped: ColumnType {
     }
 }
 #endif
-
-extension Int16 {
-    public static var defaultValue: Int16 { 0 }
-}
-
-extension Int32 {
-    public static var defaultValue: Int32 { 0 }
-}
-
-extension Int64 {
-    public static var defaultValue: Int64 { 0 }
-}
-
-extension Double {
-    public static var defaultValue: Double { 0 }
-}
-
-extension Float {
-    public static var defaultValue: Float { 0 }
-}
-
-extension Bool {
-    public static var defaultValue: Bool { false }
-}
-
-extension URL {
-    public static var defaultValue: URL {
-        #if os(Windows)
-            URL(filePath: #"C:\"#)
-        #else
-            URL(filePath: "/")
-        #endif
-    }
-}
-
-extension String {
-    public static var defaultValue: String { "" }
-}
-
-extension Data {
-    public static var defaultValue: Data { Data() }
-}
-
-extension Optional where Wrapped: ColumnType {
-    public static var defaultValue: Optional<Wrapped> { .none }
-}

@@ -21,12 +21,17 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         
         var propertyElements = ""
         var initStatements = ""
+
         for property in properties {
+            let columnName = property.identifier
+
+            initStatements += "self.\(property.identifier) = try decodeRowValue(row, \"\(columnName)\")\n"
+
             if let initialValue = property.initialValue {
                 propertyElements += #"""
                     .init(
                         keyPath: \\#(str.identifier).\#(property.identifier),
-                        columnName: "\#(property.identifier)",
+                        columnName: "\#(columnName)",
                         defaultValue: \#(initialValue._syntax.description)
                     ),
                     """#
@@ -34,10 +39,9 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                 propertyElements += #"""
                     .init(
                         keyPath: \\#(str.identifier).\#(property.identifier),
-                        columnName: "\#(property.identifier)"
+                        columnName: "\#(columnName)"
                     ),
                     """#
-                initStatements += "self.\(property.identifier) = .defaultValue\n"
             }
         }
         
@@ -53,9 +57,12 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                 """
 
                 """
-                public init() {
+                #if !canImport(CoreData)
+                public init(row: Row) throws {
+                    self.rowid = try decodeRowValue(row, "rowid")
                     \(raw: initStatements)
                 }
+                #endif
                 """
             }
         ]
