@@ -1,6 +1,6 @@
 import Foundation
 
-enum SqlExpression {
+enum SqlExpression: Sendable {
     case column(name: String)
     indirect case unaryOperator(operation: String, expression: SqlExpression, isPrefix: Bool = true)
     indirect case binaryOperator(

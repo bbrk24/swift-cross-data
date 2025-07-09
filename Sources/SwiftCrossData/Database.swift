@@ -11,8 +11,8 @@
             self.connection = connection
         }
 
-        func withConnection<T, E: Error>(
-            _ body: @Sendable (borrowing Connection) throws(E) -> T
+        func withConnection<T: Sendable, E: Error>(
+            _ body: sending (borrowing Connection) throws(E) -> T
         ) throws(E) -> T {
             return try body(connection)
         }
@@ -45,7 +45,7 @@
     }
 #endif
 
-public final class Database: Sendable {
+public struct Database: Sendable {
     #if canImport(CoreData)
     #else
         let connectionWrapper: ConnectionWrapper
@@ -106,64 +106,69 @@ public final class Database: Sendable {
         #if canImport(CoreData)
             fatalError("TODO")
         #else
-            try await connectionWrapper.withConnection { [values] (conn) in
-                for value in values {
-                    func createSetter<T: ColumnType>(
-                        keyPath: PartialKeyPath<C.Element>,
-                        columnType: T.Type,
-                        columnName: String
-                    ) -> Setter {
-                        let keyPath = keyPath as! WritableKeyPath<C.Element, T>
-                        let sqliteValue = value[keyPath: keyPath].sqliteValue
+            try await connectionWrapper.withConnection { conn in
+                func createSetter<T: ColumnType>(
+                    value: C.Element,
+                    keyPath: PartialKeyPath<C.Element>,
+                    columnType: T.Type,
+                    columnName: String
+                ) -> Setter {
+                    let keyPath = keyPath as! WritableKeyPath<C.Element, T>
+                    let sqliteValue = value[keyPath: keyPath].sqliteValue
 
-                        return switch sqliteValue {
-                        case .integer(let i):
-                            SQLite.Expression(columnName) <- i
-                        case .real(let r):
-                            SQLite.Expression(columnName) <- r
-                        case .text(let s):
-                            SQLite.Expression(columnName) <- s
-                        case .blob(let b):
-                            SQLite.Expression(columnName) <- b
-                        case .null:
-                            SQLite.Expression<Int?>(columnName) <- nil
-                        }
+                    return switch sqliteValue {
+                    case .integer(let i):
+                        SQLite.Expression(columnName) <- i
+                    case .real(let r):
+                        SQLite.Expression(columnName) <- r
+                    case .text(let s):
+                        SQLite.Expression(columnName) <- s
+                    case .blob(let b):
+                        SQLite.Expression(columnName) <- b
+                    case .null:
+                        SQLite.Expression<Int?>(columnName) <- nil
                     }
+                }
 
-                    let statement = Table(C.Element.getTableName())
-                        .insert(
-                            or: .abort,
+                let statement = Table(C.Element.getTableName())
+                    .insertMany(
+                        or: .abort,
+                        values.map { value in
                             C.Element.properties.map {
                                 createSetter(
+                                    value: value,
                                     keyPath: $0.keyPath,
                                     columnType: $0.columnType,
                                     columnName: $0.columnName
                                 )
                             }
-                        )
+                        }
+                    )
 
-                    try conn.run(statement)
-                }
+                try conn.run(statement)
             }
         #endif
     }
 }
 
-public enum SortDirection {
+public enum SortDirection: Sendable, Hashable, BitwiseCopyable {
     case asc, desc
 }
 
-public struct SortItem<T: Model> {
-    var keyPath: PartialKeyPath<T>
+public struct ReadFailedError: Error {
+}
+
+public struct SortItem<T: Model>: Sendable {
+    var keyPath: PartialKeyPath<T> & Sendable
     var direction: SortDirection
 
-    public init<U>(_ keyPath: WritableKeyPath<T, U>, direction: SortDirection = .asc) {
+    public init<U: ColumnType>(_ keyPath: WritableKeyPath<T, U> & Sendable, direction: SortDirection = .asc) {
         self.keyPath = keyPath
         self.direction = direction
     }
 }
 
-public struct QueryWrapper<T: Model> {
+public struct QueryWrapper<T: Model>: Sendable {
     let db: Database
     let sortFields: [SortItem<T>]
     let expression: SqlExpression
@@ -173,8 +178,9 @@ public struct QueryWrapper<T: Model> {
             fatalError("TODO")
         }
 
-        public func collect<C: RangeReplaceableCollection>(as _: C.Type) async throws -> C
-        where C.Element == T {
+        public func collect<C: RangeReplaceableCollection<T> & Sendable>(
+            as _: C.Type
+        ) async throws -> C {
             fatalError("TODO")
         }
     #else
@@ -185,10 +191,11 @@ public struct QueryWrapper<T: Model> {
                 return (SQLite.Expression<Int>(name).description, [])
             case .unaryOperator(let operation, let expression, let isPrefix):
                 let (inner, args) = compile(expression: expression)
+
                 if isPrefix {
-                    return (operation + inner, args)
+                    return ("(\(operation)\(inner))", args)
                 } else {
-                    return (inner + operation, args)
+                    return ("(\(inner)\(operation))", args)
                 }
             case .binaryOperator(let operation, let lhs, let rhs):
                 let (lhsInner, lhsArgs) = compile(expression: lhs)
@@ -246,16 +253,19 @@ public struct QueryWrapper<T: Model> {
 
             let queryString = "SELECT COUNT(*) FROM \(quotedTableName) WHERE \(whereClause);"
 
-            return try await db.connectionWrapper.withConnection { [queryString] (conn) in
+            return try await db.connectionWrapper.withConnection { conn in
                 let query = try conn.prepare(queryString, arguments)
 
-                _ = try query.step()
+                guard try query.step() else {
+                    throw ReadFailedError()
+                }
                 return query.row[0]
             }
         }
 
-        public func collect<C: RangeReplaceableCollection>(as _: C.Type) async throws -> C
-        where C.Element == T {
+        public func collect<C: RangeReplaceableCollection<T> & Sendable>(
+            as _: C.Type
+        ) async throws -> C {
             let (whereClause, arguments) = Self.compile(expression: self.expression)
 
             // generic argument doesn't matter

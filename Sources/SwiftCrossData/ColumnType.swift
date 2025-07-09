@@ -2,7 +2,7 @@
 #if canImport(CoreData)
     import CoreData
 
-    public protocol ColumnType {
+    public protocol ColumnType: Sendable {
         static var attributeType: NSAttributeDescription.AttributeType { get }
         static var isOptional: Bool { get }
     }
@@ -89,7 +89,7 @@
 #else
     import Foundation
 
-    public enum SqliteTypeName: Sendable, Equatable {
+    public enum SqliteTypeName: Sendable, Hashable {
         case integer, real, text, blob
         indirect case null(SqliteTypeName)
 
@@ -117,7 +117,7 @@
         }
     }
 
-    public enum SqliteValue: Sendable {
+    public enum SqliteValue: Sendable, Hashable {
         case integer(Int64)
         case real(Double)
         case text(String)
@@ -125,7 +125,7 @@
         case null
     }
 
-    public protocol ColumnType {
+    public protocol ColumnType: Sendable {
         static var sqliteTypeName: SqliteTypeName { get }
         var sqliteValue: SqliteValue { get }
         static func decode(sqliteValue: SqliteValue) -> Self?

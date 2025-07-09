@@ -56,6 +56,5 @@ let package = Package(
                 .product(name: "SwiftSyntaxMacrosTestSupport", package: "swift-syntax"),
             ]
         ),
-    ],
-    swiftLanguageModes: [.v5] // shut up about concurrency
+    ]
 )
