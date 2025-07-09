@@ -88,7 +88,7 @@ public struct Database: Sendable {
     public func select<T: Model>(
         from _: T.Type = T.self,
         orderBy sortFields: [SortItem<T>] = [],
-        where predicate: (TableProxy<T>) -> ExpressionProxy<Bool>
+        where predicate: (borrowing TableProxy<T>) -> ExpressionProxy<Bool>
     ) -> QueryWrapper<T> {
         return .init(
             db: self,
@@ -162,7 +162,10 @@ public struct SortItem<T: Model>: Sendable {
     var keyPath: PartialKeyPath<T> & Sendable
     var direction: SortDirection
 
-    public init<U: ColumnType>(_ keyPath: WritableKeyPath<T, U> & Sendable, direction: SortDirection = .asc) {
+    public init<U: ColumnType>(
+        _ keyPath: WritableKeyPath<T, U> & Sendable,
+        direction: SortDirection = .asc
+    ) {
         self.keyPath = keyPath
         self.direction = direction
     }

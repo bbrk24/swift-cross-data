@@ -26,7 +26,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
             let columnName = property.identifier
 
             initStatements +=
-                "self.\(property.identifier) = try decodeRowValue(row, \"\(columnName)\")\n"
+                "self.\(property.identifier) = try SwiftCrossData.decodeRowValue(row, \"\(columnName)\")\n"
 
             if let initialValue = property.initialValue {
                 propertyElements += #"""
