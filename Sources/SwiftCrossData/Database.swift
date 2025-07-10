@@ -105,18 +105,19 @@ public struct Database: Sendable {
         return try await insert([value])[0]
     }
 
-    public func insert<M: Model>(_ values: consuming [M]) async throws -> [M] {
+    public func insert<S: Sequence>(_ values: sending S) async throws -> [S.Element]
+    where S.Element: Model {
         #if canImport(CoreData)
             fatalError("TODO")
         #else
             try await connectionWrapper.withConnection { conn in
                 func createSetter<T: ColumnType>(
-                    value: M,
-                    keyPath: PartialKeyPath<M>,
+                    value: S.Element,
+                    keyPath: PartialKeyPath<S.Element>,
                     columnType: T.Type,
                     columnName: String
                 ) -> Setter {
-                    let keyPath = keyPath as! WritableKeyPath<M, T>
+                    let keyPath = keyPath as! WritableKeyPath<S.Element, T>
                     let sqliteValue = value[keyPath: keyPath].sqliteValue
 
                     return switch sqliteValue {
@@ -133,15 +134,15 @@ public struct Database: Sendable {
                     }
                 }
 
-                let table = Table(M.getTableName())
+                let table = Table(S.Element.getTableName())
 
-                var results: [M] = []
+                var results: [S.Element] = []
 
                 try conn.transaction {
-                    results = try values.map { (value: consuming M) in
+                    results = try values.map { (value: consuming S.Element) in
                         let statement = table.insert(
                             or: .abort,
-                            M.properties.map {
+                            S.Element.properties.map {
                                 createSetter(
                                     value: value,
                                     keyPath: $0.keyPath,
@@ -162,12 +163,67 @@ public struct Database: Sendable {
             }
         #endif
     }
+
+    public func delete<M: Model>(_ model: consuming M) async throws {
+        #if canImport(CoreData)
+            fatalError("TODO")
+        #else
+            try await connectionWrapper.withConnection { conn in
+                _ = try conn.run(
+                    Table(M.getTableName())
+                        .filter(SQLite.Expression<Int64>("rowid") == model.rowid)
+                        .delete()
+                )
+            }
+        #endif
+    }
+
+    @discardableResult
+    public func delete<S: Sequence>(_ models: sending S) async throws -> Int
+    where S.Element: Model {
+        #if canImport(CoreData)
+            fatalError("TODO")
+        #else
+            try await connectionWrapper.withConnection { conn in
+                try conn.run(
+                    Table(S.Element.getTableName())
+                        .filter(models.map(\.rowid).contains(SQLite.Expression("rowid")))
+                        .delete()
+                )
+            }
+        #endif
+    }
+
+    @discardableResult
+    public func delete<M: Model>(
+        from _: M.Type,
+        where predicate: (borrowing TableProxy<M>) -> ExpressionProxy<Bool>
+    ) async throws -> Int {
+        #if canImport(CoreData)
+            fatalError("TODO")
+        #else
+            let expression = predicate(.init()).expression
+
+            let (whereClause, arguments) = QueryWrapper<M>.compile(expression: expression)
+            let quotedTableName = SQLite.Expression<Int>(M.getTableName()).description
+
+            let queryString = "DELETE FROM \(quotedTableName) WHERE \(whereClause);"
+
+            return try await connectionWrapper.withConnection {
+                [queryString, arguments] (conn) in
+
+                try conn.run(queryString, arguments)
+                return conn.changes
+            }
+        #endif
+    }
 }
 
 public enum SortDirection: Sendable, Hashable, BitwiseCopyable {
     case asc, desc
 }
 
+/// Fetching the row failed due to a SQLite error.
 public struct ReadFailedError: Error {
 }
 
@@ -202,7 +258,7 @@ public struct QueryWrapper<T: Model>: Sendable {
             fatalError("TODO")
         }
     #else
-        private static func compile(expression: SqlExpression) -> (String, [Binding?]) {
+        static func compile(expression: SqlExpression) -> (String, [Binding?]) {
             switch expression {
             case .column(let name):
                 // generic argument doesn't matter

@@ -9,15 +9,6 @@ let db = try! Database(models: [Foo.self], dbFileName: "./db.sqlite")
 
 print(try! await db.insert(Foo(name: "new model")))
 
-let models =
-    try! await db.select(
-        from: Foo.self,
-        limit: 2,
-        offset: 1,
-        where: { _ in
-            ExpressionProxy(true)
-        }
-    )
-    .collect()
+print(try! await db.delete(from: Foo.self, where: { foo in foo.name == "new model" }))
 
-print(models)
+print(try! await db.select(from: Foo.self, where: { _ in ExpressionProxy(true) }).collect())

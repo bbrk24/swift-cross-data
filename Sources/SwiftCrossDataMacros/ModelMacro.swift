@@ -61,10 +61,10 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
 
                 """
                 #if !canImport(CoreData)
-                public init(row: SwiftCrossData.Row) throws {
-                    self.rowid = try SwiftCrossData.decodeRowValue(row, "rowid")
-                    \(raw: initStatements)
-                }
+                    public init(row: SwiftCrossData.Row) throws {
+                        self.rowid = try SwiftCrossData.decodeRowValue(row, "rowid")
+                        \(raw: initStatements)
+                    }
                 #endif
                 """
             }
@@ -80,7 +80,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         return [
             """
             #if !canImport(CoreData)
-            var rowid: Int64 = -1
+                public var rowid: Int64 = -1
             #endif
             """
         ]
@@ -124,9 +124,9 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         return [
             """
             #if canImport(CoreData)
-            final class SCDataModel_\(raw: str.identifier): NSManagedObject {
-                \(raw: propertyElements)
-            }
+                final class SCDataModel_\(raw: str.identifier): NSManagedObject {
+                    \(raw: propertyElements)
+                }
             #endif
             """
         ]
