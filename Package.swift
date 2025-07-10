@@ -20,8 +20,14 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.0-latest"),
-        .package(url: "https://github.com/stackotter/swift-macro-toolkit.git", .upToNextMinor(from: "0.6.1")),
-        .package(url: "https://github.com/stephencelis/SQLite.swift.git", .upToNextMinor(from: "0.15.4")),
+        .package(
+            url: "https://github.com/stackotter/swift-macro-toolkit.git",
+            .upToNextMinor(from: "0.6.1")
+        ),
+        .package(
+            url: "https://github.com/stephencelis/SQLite.swift.git",
+            .upToNextMinor(from: "0.15.4")
+        ),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -32,7 +38,7 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
-                .product(name: "MacroToolkit", package: "swift-macro-toolkit")
+                .product(name: "MacroToolkit", package: "swift-macro-toolkit"),
             ]
         ),
 
@@ -41,7 +47,11 @@ let package = Package(
             name: "SwiftCrossData",
             dependencies: [
                 "SwiftCrossDataMacros",
-                .product(name: "SQLite", package: "SQLite.swift", condition: .when(platforms: [.linux, .windows])),
+                .product(
+                    name: "SQLite",
+                    package: "SQLite.swift",
+                    condition: .when(platforms: [.linux, .windows])
+                ),
             ]
         ),
 

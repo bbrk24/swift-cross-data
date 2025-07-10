@@ -88,32 +88,35 @@ public struct Database: Sendable {
     public func select<T: Model>(
         from _: T.Type = T.self,
         orderBy sortFields: [SortItem<T>] = [],
+        limit: Int? = nil,
+        offset: Int? = nil,
         where predicate: (borrowing TableProxy<T>) -> ExpressionProxy<Bool>
     ) -> QueryWrapper<T> {
         return .init(
             db: self,
             sortFields: sortFields,
-            expression: predicate(.init()).expression
+            expression: predicate(.init()).expression,
+            limit: limit,
+            offset: offset
         )
     }
 
-    public func insert<T: Model>(_ values: T...) async throws {
-        return try await insert(values)
+    public func insert<M: Model>(_ value: consuming M) async throws -> M {
+        return try await insert([value])[0]
     }
 
-    public func insert<C: Collection>(_ values: sending C) async throws
-    where C.Element: Model {
+    public func insert<M: Model>(_ values: consuming [M]) async throws -> [M] {
         #if canImport(CoreData)
             fatalError("TODO")
         #else
             try await connectionWrapper.withConnection { conn in
                 func createSetter<T: ColumnType>(
-                    value: C.Element,
-                    keyPath: PartialKeyPath<C.Element>,
+                    value: M,
+                    keyPath: PartialKeyPath<M>,
                     columnType: T.Type,
                     columnName: String
                 ) -> Setter {
-                    let keyPath = keyPath as! WritableKeyPath<C.Element, T>
+                    let keyPath = keyPath as! WritableKeyPath<M, T>
                     let sqliteValue = value[keyPath: keyPath].sqliteValue
 
                     return switch sqliteValue {
@@ -130,11 +133,15 @@ public struct Database: Sendable {
                     }
                 }
 
-                let statement = Table(C.Element.getTableName())
-                    .insertMany(
-                        or: .abort,
-                        values.map { value in
-                            C.Element.properties.map {
+                let table = Table(M.getTableName())
+
+                var results: [M] = []
+
+                try conn.transaction {
+                    results = try values.map { (value: consuming M) in
+                        let statement = table.insert(
+                            or: .abort,
+                            M.properties.map {
                                 createSetter(
                                     value: value,
                                     keyPath: $0.keyPath,
@@ -142,10 +149,16 @@ public struct Database: Sendable {
                                     columnName: $0.columnName
                                 )
                             }
-                        }
-                    )
+                        )
 
-                try conn.run(statement)
+                        let rowid = try conn.run(statement)
+
+                        value.rowid = rowid
+                        return value
+                    }
+                }
+
+                return results
             }
         #endif
     }
@@ -164,7 +177,7 @@ public struct SortItem<T: Model>: Sendable {
 
     public init<U: ColumnType>(
         _ keyPath: WritableKeyPath<T, U> & Sendable,
-        direction: SortDirection = .asc
+        _ direction: SortDirection = .asc
     ) {
         self.keyPath = keyPath
         self.direction = direction
@@ -175,6 +188,8 @@ public struct QueryWrapper<T: Model>: Sendable {
     let db: Database
     let sortFields: [SortItem<T>]
     let expression: SqlExpression
+    let limit: Int?
+    let offset: Int?
 
     #if canImport(CoreData)
         public func count() async throws -> Int64 {
@@ -250,13 +265,26 @@ public struct QueryWrapper<T: Model>: Sendable {
         }
 
         public func count() async throws -> Int64 {
-            let (whereClause, arguments) = Self.compile(expression: self.expression)
+            var (whereClause, arguments) = Self.compile(expression: self.expression)
 
             let quotedTableName = SQLite.Expression<Int>(T.getTableName()).description
 
-            let queryString = "SELECT COUNT(*) FROM \(quotedTableName) WHERE \(whereClause);"
+            var queryString = "SELECT COUNT(*) FROM \(quotedTableName) WHERE \(whereClause)"
 
-            return try await db.connectionWrapper.withConnection { conn in
+            if let limit {
+                queryString += " LIMIT ?"
+                arguments.append(Int64(limit))
+            }
+            if let offset {
+                queryString += " OFFSET ?"
+                arguments.append(Int64(offset))
+            }
+
+            queryString += ";"
+
+            return try await db.connectionWrapper.withConnection {
+                [queryString, arguments] (conn) in
+
                 let query = try conn.prepare(queryString, arguments)
 
                 guard try query.step() else {
@@ -269,7 +297,7 @@ public struct QueryWrapper<T: Model>: Sendable {
         public func collect<C: RangeReplaceableCollection<T> & Sendable>(
             as _: C.Type
         ) async throws -> C {
-            let (whereClause, arguments) = Self.compile(expression: self.expression)
+            var (whereClause, arguments) = Self.compile(expression: self.expression)
 
             // generic argument doesn't matter
             let quotedTableName = SQLite.Expression<Int>(T.getTableName()).description
@@ -292,9 +320,22 @@ public struct QueryWrapper<T: Model>: Sendable {
                 queryString +=
                     "\(SQLite.Expression<Int>(columnName).description) \(directionString), "
             }
-            queryString += "rowid;"
+            queryString += "rowid"
 
-            return try await db.connectionWrapper.withConnection { [queryString] (conn) in
+            if let limit {
+                queryString += " LIMIT ?"
+                arguments.append(Int64(limit))
+            }
+            if let offset {
+                queryString += " OFFSET ?"
+                arguments.append(Int64(offset))
+            }
+
+            queryString += ";"
+
+            return try await db.connectionWrapper.withConnection {
+                [queryString, arguments] (conn) in
+
                 let rows = try conn.prepareRowIterator(queryString, bindings: arguments)
 
                 var results = C.init()
