@@ -110,7 +110,7 @@
             case .text:
                 return "TEXT"
             case .blob:
-                return "NONE"
+                return "BLOB"
             case .null(let inner):
                 return inner.castTypeString
             }
