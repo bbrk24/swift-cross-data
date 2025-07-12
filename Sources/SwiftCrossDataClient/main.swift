@@ -7,8 +7,14 @@ struct Foo {
 
 let db = try! Database(models: [Foo.self], dbFileName: "./db.sqlite")
 
-print(try! await db.insert(Foo(name: "new model")))
-
-print(try! await db.delete(from: Foo.self, where: { foo in foo.name == "new model" }))
+print(try! await db.update(
+    Foo.self,
+    set: { foo in
+        foo.name = foo.name.uppercased()
+    },
+    where: { foo in
+        foo.name.count < 5
+    }
+))
 
 print(try! await db.select(from: Foo.self, where: { _ in ExpressionProxy(true) }).collect())

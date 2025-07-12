@@ -63,6 +63,18 @@
                 ) -> ExpressionProxy<${type}> {
                     ExpressionProxy(lhs) ${operator} rhs
                 }
+                public static func ${operator}= (
+                    lhs: inout ExpressionProxy<${type}>,
+                    rhs: ExpressionProxy<${other_type}>
+                ) {
+                    lhs = lhs ${operator} rhs
+                }
+                public static func ${operator}= (
+                    lhs: inout ExpressionProxy<${type}>,
+                    rhs: ${other_type}
+                ) {
+                    lhs = lhs ${operator} rhs
+                }
             % end
         % end
 
@@ -99,6 +111,18 @@
                 rhs: ExpressionProxy<${type}>
             ) -> ExpressionProxy<${type}> {
                 ExpressionProxy(lhs) ${operator} rhs
+            }
+            public static func ${operator}= (
+                lhs: inout ExpressionProxy<${type}>,
+                rhs: ExpressionProxy<${type}>
+            ) {
+                lhs = lhs ${operator} rhs
+            }
+            public static func ${operator}= (
+                lhs: inout ExpressionProxy<${type}>,
+                rhs: ${type}
+            ) {
+                lhs = lhs ${operator} rhs
             }
         % end
     }
@@ -140,6 +164,18 @@
                 rhs: ExpressionProxy<${type}>
             ) -> ExpressionProxy<${type}> {
                 ExpressionProxy(lhs) ${operator} rhs
+            }
+            public static func ${operator}= (
+                lhs: inout ExpressionProxy<${type}>,
+                rhs: ExpressionProxy<${type}>
+            ) {
+                lhs = lhs ${operator} rhs
+            }
+            public static func ${operator}= (
+                lhs: inout ExpressionProxy<${type}>,
+                rhs: ${type}
+            ) {
+                lhs = lhs ${operator} rhs
             }
         % end
 

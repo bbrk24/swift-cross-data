@@ -190,6 +190,18 @@
                 ) -> ExpressionProxy<Int16> {
                     ExpressionProxy(lhs) << rhs
                 }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: ExpressionProxy<Int16>
+                ) {
+                    lhs = lhs << rhs
+                }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: Int16
+                ) {
+                    lhs = lhs << rhs
+                }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func >> (
                     lhs: ExpressionProxy<Int16>,
@@ -223,6 +235,18 @@
                     rhs: ExpressionProxy<Int16>
                 ) -> ExpressionProxy<Int16> {
                     ExpressionProxy(lhs) >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: ExpressionProxy<Int16>
+                ) {
+                    lhs = lhs >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: Int16
+                ) {
+                    lhs = lhs >> rhs
                 }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func << (
@@ -258,6 +282,18 @@
                 ) -> ExpressionProxy<Int16> {
                     ExpressionProxy(lhs) << rhs
                 }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: ExpressionProxy<Int32>
+                ) {
+                    lhs = lhs << rhs
+                }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: Int32
+                ) {
+                    lhs = lhs << rhs
+                }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func >> (
                     lhs: ExpressionProxy<Int16>,
@@ -291,6 +327,18 @@
                     rhs: ExpressionProxy<Int32>
                 ) -> ExpressionProxy<Int16> {
                     ExpressionProxy(lhs) >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: ExpressionProxy<Int32>
+                ) {
+                    lhs = lhs >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: Int32
+                ) {
+                    lhs = lhs >> rhs
                 }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func << (
@@ -326,6 +374,18 @@
                 ) -> ExpressionProxy<Int16> {
                     ExpressionProxy(lhs) << rhs
                 }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: ExpressionProxy<Int64>
+                ) {
+                    lhs = lhs << rhs
+                }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: Int64
+                ) {
+                    lhs = lhs << rhs
+                }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func >> (
                     lhs: ExpressionProxy<Int16>,
@@ -360,9 +420,21 @@
                 ) -> ExpressionProxy<Int16> {
                     ExpressionProxy(lhs) >> rhs
                 }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 68)
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: ExpressionProxy<Int64>
+                ) {
+                    lhs = lhs >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int16>,
+                    rhs: Int64
+                ) {
+                    lhs = lhs >> rhs
+                }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 80)
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 70)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 82)
             public static func % (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -396,7 +468,19 @@
             ) -> ExpressionProxy<Int16> {
                 ExpressionProxy(lhs) % rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 70)
+            public static func %= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: ExpressionProxy<Int16>
+            ) {
+                lhs = lhs % rhs
+            }
+            public static func %= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: Int16
+            ) {
+                lhs = lhs % rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 82)
             public static func & (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -430,7 +514,19 @@
             ) -> ExpressionProxy<Int16> {
                 ExpressionProxy(lhs) & rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 70)
+            public static func &= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: ExpressionProxy<Int16>
+            ) {
+                lhs = lhs & rhs
+            }
+            public static func &= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: Int16
+            ) {
+                lhs = lhs & rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 82)
             public static func | (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -464,7 +560,19 @@
             ) -> ExpressionProxy<Int16> {
                 ExpressionProxy(lhs) | rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 104)
+            public static func |= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: ExpressionProxy<Int16>
+            ) {
+                lhs = lhs | rhs
+            }
+            public static func |= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: Int16
+            ) {
+                lhs = lhs | rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 128)
     }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 30)
     extension ExpressionProxy where T == Int32 {
@@ -502,6 +610,18 @@
                 ) -> ExpressionProxy<Int32> {
                     ExpressionProxy(lhs) << rhs
                 }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: ExpressionProxy<Int16>
+                ) {
+                    lhs = lhs << rhs
+                }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: Int16
+                ) {
+                    lhs = lhs << rhs
+                }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func >> (
                     lhs: ExpressionProxy<Int32>,
@@ -535,6 +655,18 @@
                     rhs: ExpressionProxy<Int16>
                 ) -> ExpressionProxy<Int32> {
                     ExpressionProxy(lhs) >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: ExpressionProxy<Int16>
+                ) {
+                    lhs = lhs >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: Int16
+                ) {
+                    lhs = lhs >> rhs
                 }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func << (
@@ -570,6 +702,18 @@
                 ) -> ExpressionProxy<Int32> {
                     ExpressionProxy(lhs) << rhs
                 }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: ExpressionProxy<Int32>
+                ) {
+                    lhs = lhs << rhs
+                }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: Int32
+                ) {
+                    lhs = lhs << rhs
+                }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func >> (
                     lhs: ExpressionProxy<Int32>,
@@ -603,6 +747,18 @@
                     rhs: ExpressionProxy<Int32>
                 ) -> ExpressionProxy<Int32> {
                     ExpressionProxy(lhs) >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: ExpressionProxy<Int32>
+                ) {
+                    lhs = lhs >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: Int32
+                ) {
+                    lhs = lhs >> rhs
                 }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func << (
@@ -638,6 +794,18 @@
                 ) -> ExpressionProxy<Int32> {
                     ExpressionProxy(lhs) << rhs
                 }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: ExpressionProxy<Int64>
+                ) {
+                    lhs = lhs << rhs
+                }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: Int64
+                ) {
+                    lhs = lhs << rhs
+                }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func >> (
                     lhs: ExpressionProxy<Int32>,
@@ -672,9 +840,21 @@
                 ) -> ExpressionProxy<Int32> {
                     ExpressionProxy(lhs) >> rhs
                 }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 68)
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: ExpressionProxy<Int64>
+                ) {
+                    lhs = lhs >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int32>,
+                    rhs: Int64
+                ) {
+                    lhs = lhs >> rhs
+                }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 80)
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 70)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 82)
             public static func % (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -708,7 +888,19 @@
             ) -> ExpressionProxy<Int32> {
                 ExpressionProxy(lhs) % rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 70)
+            public static func %= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: ExpressionProxy<Int32>
+            ) {
+                lhs = lhs % rhs
+            }
+            public static func %= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: Int32
+            ) {
+                lhs = lhs % rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 82)
             public static func & (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -742,7 +934,19 @@
             ) -> ExpressionProxy<Int32> {
                 ExpressionProxy(lhs) & rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 70)
+            public static func &= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: ExpressionProxy<Int32>
+            ) {
+                lhs = lhs & rhs
+            }
+            public static func &= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: Int32
+            ) {
+                lhs = lhs & rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 82)
             public static func | (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -776,7 +980,19 @@
             ) -> ExpressionProxy<Int32> {
                 ExpressionProxy(lhs) | rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 104)
+            public static func |= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: ExpressionProxy<Int32>
+            ) {
+                lhs = lhs | rhs
+            }
+            public static func |= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: Int32
+            ) {
+                lhs = lhs | rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 128)
     }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 30)
     extension ExpressionProxy where T == Int64 {
@@ -814,6 +1030,18 @@
                 ) -> ExpressionProxy<Int64> {
                     ExpressionProxy(lhs) << rhs
                 }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: ExpressionProxy<Int16>
+                ) {
+                    lhs = lhs << rhs
+                }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: Int16
+                ) {
+                    lhs = lhs << rhs
+                }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func >> (
                     lhs: ExpressionProxy<Int64>,
@@ -847,6 +1075,18 @@
                     rhs: ExpressionProxy<Int16>
                 ) -> ExpressionProxy<Int64> {
                     ExpressionProxy(lhs) >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: ExpressionProxy<Int16>
+                ) {
+                    lhs = lhs >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: Int16
+                ) {
+                    lhs = lhs >> rhs
                 }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func << (
@@ -882,6 +1122,18 @@
                 ) -> ExpressionProxy<Int64> {
                     ExpressionProxy(lhs) << rhs
                 }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: ExpressionProxy<Int32>
+                ) {
+                    lhs = lhs << rhs
+                }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: Int32
+                ) {
+                    lhs = lhs << rhs
+                }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func >> (
                     lhs: ExpressionProxy<Int64>,
@@ -915,6 +1167,18 @@
                     rhs: ExpressionProxy<Int32>
                 ) -> ExpressionProxy<Int64> {
                     ExpressionProxy(lhs) >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: ExpressionProxy<Int32>
+                ) {
+                    lhs = lhs >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: Int32
+                ) {
+                    lhs = lhs >> rhs
                 }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func << (
@@ -950,6 +1214,18 @@
                 ) -> ExpressionProxy<Int64> {
                     ExpressionProxy(lhs) << rhs
                 }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: ExpressionProxy<Int64>
+                ) {
+                    lhs = lhs << rhs
+                }
+                public static func <<= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: Int64
+                ) {
+                    lhs = lhs << rhs
+                }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 33)
                 public static func >> (
                     lhs: ExpressionProxy<Int64>,
@@ -984,9 +1260,21 @@
                 ) -> ExpressionProxy<Int64> {
                     ExpressionProxy(lhs) >> rhs
                 }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 68)
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: ExpressionProxy<Int64>
+                ) {
+                    lhs = lhs >> rhs
+                }
+                public static func >>= (
+                    lhs: inout ExpressionProxy<Int64>,
+                    rhs: Int64
+                ) {
+                    lhs = lhs >> rhs
+                }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 80)
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 70)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 82)
             public static func % (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1020,7 +1308,19 @@
             ) -> ExpressionProxy<Int64> {
                 ExpressionProxy(lhs) % rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 70)
+            public static func %= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: ExpressionProxy<Int64>
+            ) {
+                lhs = lhs % rhs
+            }
+            public static func %= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: Int64
+            ) {
+                lhs = lhs % rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 82)
             public static func & (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1054,7 +1354,19 @@
             ) -> ExpressionProxy<Int64> {
                 ExpressionProxy(lhs) & rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 70)
+            public static func &= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: ExpressionProxy<Int64>
+            ) {
+                lhs = lhs & rhs
+            }
+            public static func &= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: Int64
+            ) {
+                lhs = lhs & rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 82)
             public static func | (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1088,11 +1400,23 @@
             ) -> ExpressionProxy<Int64> {
                 ExpressionProxy(lhs) | rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 104)
+            public static func |= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: ExpressionProxy<Int64>
+            ) {
+                lhs = lhs | rhs
+            }
+            public static func |= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: Int64
+            ) {
+                lhs = lhs | rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 128)
     }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 106)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 130)
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 108)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 132)
     extension ExpressionProxy where T == Int16 {
         public func abs() -> ExpressionProxy<Int16> {
             .init(expression: .functionCall(functionName: "abs", arguments: [self.expression]))
@@ -1104,7 +1428,7 @@
             .init(expression: .unaryOperator(operation: "-", expression: operand.expression))
         }
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func * (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -1129,7 +1453,19 @@
             ) -> ExpressionProxy<Int16> {
                 ExpressionProxy(lhs) * rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func *= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: ExpressionProxy<Int16>
+            ) {
+                lhs = lhs * rhs
+            }
+            public static func *= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: Int16
+            ) {
+                lhs = lhs * rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func / (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -1154,7 +1490,19 @@
             ) -> ExpressionProxy<Int16> {
                 ExpressionProxy(lhs) / rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func /= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: ExpressionProxy<Int16>
+            ) {
+                lhs = lhs / rhs
+            }
+            public static func /= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: Int16
+            ) {
+                lhs = lhs / rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func + (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -1179,7 +1527,19 @@
             ) -> ExpressionProxy<Int16> {
                 ExpressionProxy(lhs) + rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func += (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: ExpressionProxy<Int16>
+            ) {
+                lhs = lhs + rhs
+            }
+            public static func += (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: Int16
+            ) {
+                lhs = lhs + rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func - (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -1204,9 +1564,21 @@
             ) -> ExpressionProxy<Int16> {
                 ExpressionProxy(lhs) - rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 145)
+            public static func -= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: ExpressionProxy<Int16>
+            ) {
+                lhs = lhs - rhs
+            }
+            public static func -= (
+                lhs: inout ExpressionProxy<Int16>,
+                rhs: Int16
+            ) {
+                lhs = lhs - rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 181)
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func < (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -1231,7 +1603,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) < rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func > (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -1256,7 +1628,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) > rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func <= (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -1281,7 +1653,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) <= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func >= (
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
@@ -1306,9 +1678,9 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 172)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
     }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 108)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 132)
     extension ExpressionProxy where T == Int32 {
         public func abs() -> ExpressionProxy<Int32> {
             .init(expression: .functionCall(functionName: "abs", arguments: [self.expression]))
@@ -1320,7 +1692,7 @@
             .init(expression: .unaryOperator(operation: "-", expression: operand.expression))
         }
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func * (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -1345,7 +1717,19 @@
             ) -> ExpressionProxy<Int32> {
                 ExpressionProxy(lhs) * rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func *= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: ExpressionProxy<Int32>
+            ) {
+                lhs = lhs * rhs
+            }
+            public static func *= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: Int32
+            ) {
+                lhs = lhs * rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func / (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -1370,7 +1754,19 @@
             ) -> ExpressionProxy<Int32> {
                 ExpressionProxy(lhs) / rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func /= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: ExpressionProxy<Int32>
+            ) {
+                lhs = lhs / rhs
+            }
+            public static func /= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: Int32
+            ) {
+                lhs = lhs / rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func + (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -1395,7 +1791,19 @@
             ) -> ExpressionProxy<Int32> {
                 ExpressionProxy(lhs) + rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func += (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: ExpressionProxy<Int32>
+            ) {
+                lhs = lhs + rhs
+            }
+            public static func += (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: Int32
+            ) {
+                lhs = lhs + rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func - (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -1420,9 +1828,21 @@
             ) -> ExpressionProxy<Int32> {
                 ExpressionProxy(lhs) - rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 145)
+            public static func -= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: ExpressionProxy<Int32>
+            ) {
+                lhs = lhs - rhs
+            }
+            public static func -= (
+                lhs: inout ExpressionProxy<Int32>,
+                rhs: Int32
+            ) {
+                lhs = lhs - rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 181)
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func < (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -1447,7 +1867,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) < rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func > (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -1472,7 +1892,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) > rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func <= (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -1497,7 +1917,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) <= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func >= (
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
@@ -1522,9 +1942,9 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 172)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
     }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 108)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 132)
     extension ExpressionProxy where T == Int64 {
         public func abs() -> ExpressionProxy<Int64> {
             .init(expression: .functionCall(functionName: "abs", arguments: [self.expression]))
@@ -1536,7 +1956,7 @@
             .init(expression: .unaryOperator(operation: "-", expression: operand.expression))
         }
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func * (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1561,7 +1981,19 @@
             ) -> ExpressionProxy<Int64> {
                 ExpressionProxy(lhs) * rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func *= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: ExpressionProxy<Int64>
+            ) {
+                lhs = lhs * rhs
+            }
+            public static func *= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: Int64
+            ) {
+                lhs = lhs * rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func / (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1586,7 +2018,19 @@
             ) -> ExpressionProxy<Int64> {
                 ExpressionProxy(lhs) / rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func /= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: ExpressionProxy<Int64>
+            ) {
+                lhs = lhs / rhs
+            }
+            public static func /= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: Int64
+            ) {
+                lhs = lhs / rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func + (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1611,7 +2055,19 @@
             ) -> ExpressionProxy<Int64> {
                 ExpressionProxy(lhs) + rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func += (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: ExpressionProxy<Int64>
+            ) {
+                lhs = lhs + rhs
+            }
+            public static func += (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: Int64
+            ) {
+                lhs = lhs + rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func - (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1636,9 +2092,21 @@
             ) -> ExpressionProxy<Int64> {
                 ExpressionProxy(lhs) - rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 145)
+            public static func -= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: ExpressionProxy<Int64>
+            ) {
+                lhs = lhs - rhs
+            }
+            public static func -= (
+                lhs: inout ExpressionProxy<Int64>,
+                rhs: Int64
+            ) {
+                lhs = lhs - rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 181)
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func < (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1663,7 +2131,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) < rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func > (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1688,7 +2156,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) > rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func <= (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1713,7 +2181,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) <= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func >= (
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
@@ -1738,9 +2206,9 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 172)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
     }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 108)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 132)
     extension ExpressionProxy where T == Float {
         public func abs() -> ExpressionProxy<Float> {
             .init(expression: .functionCall(functionName: "abs", arguments: [self.expression]))
@@ -1752,7 +2220,7 @@
             .init(expression: .unaryOperator(operation: "-", expression: operand.expression))
         }
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func * (
                 lhs: ExpressionProxy<Float>,
                 rhs: ExpressionProxy<Float>
@@ -1777,7 +2245,19 @@
             ) -> ExpressionProxy<Float> {
                 ExpressionProxy(lhs) * rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func *= (
+                lhs: inout ExpressionProxy<Float>,
+                rhs: ExpressionProxy<Float>
+            ) {
+                lhs = lhs * rhs
+            }
+            public static func *= (
+                lhs: inout ExpressionProxy<Float>,
+                rhs: Float
+            ) {
+                lhs = lhs * rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func / (
                 lhs: ExpressionProxy<Float>,
                 rhs: ExpressionProxy<Float>
@@ -1802,7 +2282,19 @@
             ) -> ExpressionProxy<Float> {
                 ExpressionProxy(lhs) / rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func /= (
+                lhs: inout ExpressionProxy<Float>,
+                rhs: ExpressionProxy<Float>
+            ) {
+                lhs = lhs / rhs
+            }
+            public static func /= (
+                lhs: inout ExpressionProxy<Float>,
+                rhs: Float
+            ) {
+                lhs = lhs / rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func + (
                 lhs: ExpressionProxy<Float>,
                 rhs: ExpressionProxy<Float>
@@ -1827,7 +2319,19 @@
             ) -> ExpressionProxy<Float> {
                 ExpressionProxy(lhs) + rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func += (
+                lhs: inout ExpressionProxy<Float>,
+                rhs: ExpressionProxy<Float>
+            ) {
+                lhs = lhs + rhs
+            }
+            public static func += (
+                lhs: inout ExpressionProxy<Float>,
+                rhs: Float
+            ) {
+                lhs = lhs + rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func - (
                 lhs: ExpressionProxy<Float>,
                 rhs: ExpressionProxy<Float>
@@ -1852,9 +2356,21 @@
             ) -> ExpressionProxy<Float> {
                 ExpressionProxy(lhs) - rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 145)
+            public static func -= (
+                lhs: inout ExpressionProxy<Float>,
+                rhs: ExpressionProxy<Float>
+            ) {
+                lhs = lhs - rhs
+            }
+            public static func -= (
+                lhs: inout ExpressionProxy<Float>,
+                rhs: Float
+            ) {
+                lhs = lhs - rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 181)
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func < (
                 lhs: ExpressionProxy<Float>,
                 rhs: ExpressionProxy<Float>
@@ -1879,7 +2395,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) < rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func > (
                 lhs: ExpressionProxy<Float>,
                 rhs: ExpressionProxy<Float>
@@ -1904,7 +2420,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) > rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func <= (
                 lhs: ExpressionProxy<Float>,
                 rhs: ExpressionProxy<Float>
@@ -1929,7 +2445,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) <= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func >= (
                 lhs: ExpressionProxy<Float>,
                 rhs: ExpressionProxy<Float>
@@ -1954,9 +2470,9 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 172)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
     }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 108)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 132)
     extension ExpressionProxy where T == Double {
         public func abs() -> ExpressionProxy<Double> {
             .init(expression: .functionCall(functionName: "abs", arguments: [self.expression]))
@@ -1968,7 +2484,7 @@
             .init(expression: .unaryOperator(operation: "-", expression: operand.expression))
         }
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func * (
                 lhs: ExpressionProxy<Double>,
                 rhs: ExpressionProxy<Double>
@@ -1993,7 +2509,19 @@
             ) -> ExpressionProxy<Double> {
                 ExpressionProxy(lhs) * rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func *= (
+                lhs: inout ExpressionProxy<Double>,
+                rhs: ExpressionProxy<Double>
+            ) {
+                lhs = lhs * rhs
+            }
+            public static func *= (
+                lhs: inout ExpressionProxy<Double>,
+                rhs: Double
+            ) {
+                lhs = lhs * rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func / (
                 lhs: ExpressionProxy<Double>,
                 rhs: ExpressionProxy<Double>
@@ -2018,7 +2546,19 @@
             ) -> ExpressionProxy<Double> {
                 ExpressionProxy(lhs) / rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func /= (
+                lhs: inout ExpressionProxy<Double>,
+                rhs: ExpressionProxy<Double>
+            ) {
+                lhs = lhs / rhs
+            }
+            public static func /= (
+                lhs: inout ExpressionProxy<Double>,
+                rhs: Double
+            ) {
+                lhs = lhs / rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func + (
                 lhs: ExpressionProxy<Double>,
                 rhs: ExpressionProxy<Double>
@@ -2043,7 +2583,19 @@
             ) -> ExpressionProxy<Double> {
                 ExpressionProxy(lhs) + rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 120)
+            public static func += (
+                lhs: inout ExpressionProxy<Double>,
+                rhs: ExpressionProxy<Double>
+            ) {
+                lhs = lhs + rhs
+            }
+            public static func += (
+                lhs: inout ExpressionProxy<Double>,
+                rhs: Double
+            ) {
+                lhs = lhs + rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 144)
             public static func - (
                 lhs: ExpressionProxy<Double>,
                 rhs: ExpressionProxy<Double>
@@ -2068,9 +2620,21 @@
             ) -> ExpressionProxy<Double> {
                 ExpressionProxy(lhs) - rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 145)
+            public static func -= (
+                lhs: inout ExpressionProxy<Double>,
+                rhs: ExpressionProxy<Double>
+            ) {
+                lhs = lhs - rhs
+            }
+            public static func -= (
+                lhs: inout ExpressionProxy<Double>,
+                rhs: Double
+            ) {
+                lhs = lhs - rhs
+            }
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 181)
 
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func < (
                 lhs: ExpressionProxy<Double>,
                 rhs: ExpressionProxy<Double>
@@ -2095,7 +2659,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) < rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func > (
                 lhs: ExpressionProxy<Double>,
                 rhs: ExpressionProxy<Double>
@@ -2120,7 +2684,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) > rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func <= (
                 lhs: ExpressionProxy<Double>,
                 rhs: ExpressionProxy<Double>
@@ -2145,7 +2709,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) <= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 147)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 183)
             public static func >= (
                 lhs: ExpressionProxy<Double>,
                 rhs: ExpressionProxy<Double>
@@ -2170,5 +2734,5 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 172)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
     }

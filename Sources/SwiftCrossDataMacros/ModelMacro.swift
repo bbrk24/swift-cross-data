@@ -124,7 +124,8 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         return [
             """
             #if canImport(CoreData)
-                final class SCDataModel_\(raw: str.identifier): NSManagedObject {
+                \(raw: str.accessLevel?.name ?? "") final class \
+            SCDataModel_\(raw: str.identifier): NSManagedObject {
                     \(raw: propertyElements)
                 }
             #endif

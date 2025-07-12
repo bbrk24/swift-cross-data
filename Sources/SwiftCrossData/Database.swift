@@ -45,6 +45,29 @@
     }
 #endif
 
+func createSetter<M: Model, T: ColumnType>(
+    value: M,
+    keyPath: PartialKeyPath<M>,
+    columnType: T.Type,
+    columnName: String
+) -> Setter {
+    let keyPath = keyPath as! WritableKeyPath<M, T>
+    let sqliteValue = value[keyPath: keyPath].sqliteValue
+
+    return switch sqliteValue {
+    case .integer(let i):
+        SQLite.Expression(columnName) <- i
+    case .real(let r):
+        SQLite.Expression(columnName) <- r
+    case .text(let s):
+        SQLite.Expression(columnName) <- s
+    case .blob(let b):
+        SQLite.Expression(columnName) <- b
+    case .null:
+        SQLite.Expression<Int?>(columnName) <- nil
+    }
+}
+
 public struct Database: Sendable {
     #if canImport(CoreData)
     #else
@@ -110,32 +133,9 @@ public struct Database: Sendable {
         #if canImport(CoreData)
             fatalError("TODO")
         #else
-            try await connectionWrapper.withConnection { conn in
-                func createSetter<T: ColumnType>(
-                    value: S.Element,
-                    keyPath: PartialKeyPath<S.Element>,
-                    columnType: T.Type,
-                    columnName: String
-                ) -> Setter {
-                    let keyPath = keyPath as! WritableKeyPath<S.Element, T>
-                    let sqliteValue = value[keyPath: keyPath].sqliteValue
+            let table = Table(S.Element.getTableName())
 
-                    return switch sqliteValue {
-                    case .integer(let i):
-                        SQLite.Expression(columnName) <- i
-                    case .real(let r):
-                        SQLite.Expression(columnName) <- r
-                    case .text(let s):
-                        SQLite.Expression(columnName) <- s
-                    case .blob(let b):
-                        SQLite.Expression(columnName) <- b
-                    case .null:
-                        SQLite.Expression<Int?>(columnName) <- nil
-                    }
-                }
-
-                let table = Table(S.Element.getTableName())
-
+            return try await connectionWrapper.withConnection { conn in
                 var results: [S.Element] = []
 
                 try conn.transaction {
@@ -199,18 +199,66 @@ public struct Database: Sendable {
         from _: M.Type,
         where predicate: (borrowing TableProxy<M>) -> ExpressionProxy<Bool>
     ) async throws -> Int {
+        let expression = predicate(.init()).expression
+
         #if canImport(CoreData)
             fatalError("TODO")
         #else
-            let expression = predicate(.init()).expression
-
             let (whereClause, arguments) = QueryWrapper<M>.compile(expression: expression)
             let quotedTableName = SQLite.Expression<Int>(M.getTableName()).description
 
             let queryString = "DELETE FROM \(quotedTableName) WHERE \(whereClause);"
 
+            return try await connectionWrapper.withConnection { conn in
+                try conn.run(queryString, arguments)
+                return conn.changes
+            }
+        #endif
+    }
+
+    @discardableResult
+    public func update<T: Model>(
+        _: T.Type,
+        set updater: (inout MutableTableProxy<T>) -> Void,
+        where predicate: (borrowing TableProxy<T>) -> ExpressionProxy<Bool>
+    ) async throws -> Int {
+        let expression = predicate(.init()).expression
+
+        var mutationProxy = MutableTableProxy<T>()
+        updater(&mutationProxy)
+
+        #if canImport(CoreData)
+            fatalError("TODO")
+        #else
+            var arguments: [Binding?] = []
+            var setters: [String] = []
+
+            for (columnName, expression) in mutationProxy.columnMap {
+                if case .column(name: columnName) = expression {
+                    continue
+                }
+
+                let (exprString, setterArgs) = QueryWrapper<T>.compile(expression: expression)
+                let quotedColumnName = SQLite.Expression<Int>(columnName).description
+
+                arguments += setterArgs
+                setters.append("\(quotedColumnName) = \(exprString)")
+            }
+
+            if setters.isEmpty {
+                return 0
+            }
+
+            let (whereClause, whereArguments) = QueryWrapper<T>.compile(expression: expression)
+            arguments += whereArguments
+
+            let quotedTableName = SQLite.Expression<Int>(T.getTableName()).description
+
+            let queryString =
+                "UPDATE \(quotedTableName) SET \(setters.joined(separator: ", ")) WHERE \(whereClause);"
+
             return try await connectionWrapper.withConnection {
-                [queryString, arguments] (conn) in
+                [arguments] (conn) in
 
                 try conn.run(queryString, arguments)
                 return conn.changes

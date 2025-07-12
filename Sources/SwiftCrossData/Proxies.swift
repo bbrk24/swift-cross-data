@@ -1,5 +1,11 @@
 import Foundation
 
+#if canImport(CoreData)
+    infix operator <- : AssignmentPrecedence
+#else
+    import SQLite
+#endif
+
 enum SqlExpression: Sendable {
     case column(name: String)
     indirect case unaryOperator(operation: String, expression: SqlExpression, isPrefix: Bool = true)
@@ -132,6 +138,14 @@ public struct ExpressionProxy<T: ColumnType> {
             )
         )
     }
+
+    public static func <- (lhs: inout ExpressionProxy<T>, rhs: T) {
+        lhs = ExpressionProxy(rhs)
+    }
+
+    public static func <- (lhs: inout ExpressionProxy<T>, rhs: ExpressionProxy<T>) {
+        lhs = rhs
+    }
 }
 
 extension ExpressionProxy where T == String {
@@ -261,6 +275,51 @@ public struct TableProxy<M: Model> {
             }
 
             return .init(expression: .column(name: columnName))
+        }
+    }
+}
+
+@dynamicMemberLookup
+public struct MutableTableProxy<M: Model> {
+    var columnMap: [String: SqlExpression] = [:]
+
+    public subscript<C: ColumnType>(dynamicMember keyPath: WritableKeyPath<M, C>)
+        -> ExpressionProxy<C>
+    {
+        get {
+            guard let columnName = M.getColumnName(forKeyPath: keyPath) else {
+                preconditionFailure("Could not find column name for key path \(keyPath)")
+            }
+
+            let expression = columnMap[columnName] ?? .column(name: columnName)
+
+            return .init(expression: expression)
+        }
+        set {
+            guard let columnName = M.getColumnName(forKeyPath: keyPath) else {
+                preconditionFailure("Could not find column name for key path \(keyPath)")
+            }
+
+            columnMap[columnName] = newValue.expression
+        }
+    }
+
+    @available(
+        *,
+        unavailable,
+        message:
+            "Columns from the table are not accessible as their actual values in the 'where:' and 'set:' callbacks. If you are trying to assign a constant to a column, use the operator '<-' instead of '='."
+    )
+    public subscript<C: ColumnType>(dynamicMember keyPath: WritableKeyPath<M, C>) -> C {
+        get {
+            fatalError()
+        }
+        set {
+            guard let columnName = M.getColumnName(forKeyPath: keyPath) else {
+                preconditionFailure("Could not find column name for key path \(keyPath)")
+            }
+
+            columnMap[columnName] = .literal(value: newValue)
         }
     }
 }
