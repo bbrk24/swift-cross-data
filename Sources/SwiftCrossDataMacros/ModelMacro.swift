@@ -59,14 +59,14 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                 }
                 """
 
-                """
-                #if !canImport(CoreData)
+                #if !CORE_DATA
+                    """
                     public init(row: SwiftCrossData.Row) throws {
                         self.rowid = try SwiftCrossData.decodeRowValue(row, "rowid")
                         \(raw: initStatements)
                     }
+                    """
                 #endif
-                """
             }
         ]
     }
@@ -77,13 +77,11 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
-        return [
-            """
-            #if !canImport(CoreData)
-                public var rowid: Int64 = -1
-            #endif
-            """
-        ]
+        #if CORE_DATA
+            return []
+        #else
+            return ["public var rowid: Int64 = -1"]
+        #endif
     }
 
     public static func expansion(
@@ -91,45 +89,50 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,
         in context: some SwiftSyntaxMacros.MacroExpansionContext
     ) throws -> [SwiftSyntax.DeclSyntax] {
-        guard let declaration = declaration.as(StructDeclSyntax.self) else {
-            throw DiagnosticError(description: "Models must be structs")
-        }
+        #if CORE_DATA
+            guard let declaration = declaration.as(StructDeclSyntax.self) else {
+                throw DiagnosticError(description: "Models must be structs")
+            }
 
-        let str = Struct(declaration)
+            let str = Struct(declaration)
 
-        let properties = str.properties.filter(\.isStored)
+            let properties = str.properties.filter(\.isStored)
 
-        var propertyElements = ""
-        for property in properties {
-            guard let type = property.type else {
-                context.diagnose(
-                    Diagnostic(
-                        node: property._syntax,
-                        message: Message(
-                            message: "Could not determine property type.",
-                            diagnosticID: MessageID(domain: errorDomain, id: "MissingPropertyType"),
-                            severity: .error
+            var propertyElements = ""
+            for property in properties {
+                guard let type = property.type else {
+                    context.diagnose(
+                        Diagnostic(
+                            node: property._syntax,
+                            message: Message(
+                                message: "Could not determine property type.",
+                                diagnosticID: MessageID(
+                                    domain: errorDomain,
+                                    id: "MissingPropertyType"
+                                ),
+                                severity: .error
+                            )
                         )
                     )
-                )
-                continue
+                    continue
+                }
+                propertyElements +=
+                    "\n@NSManaged var \(property.identifier): \(type.normalizedDescription)"
+                if let initialValue = property.initialValue {
+                    propertyElements += " = \(initialValue._syntax.description)"
+                }
             }
-            propertyElements +=
-                "\n@NSManaged var \(property.identifier): \(type.normalizedDescription)"
-            if let initialValue = property.initialValue {
-                propertyElements += " = \(initialValue._syntax.description)"
-            }
-        }
 
-        return [
-            """
-            #if canImport(CoreData)
+            return [
+                """
                 \(raw: str.accessLevel?.name ?? "") final class \
-            SCDataModel_\(raw: str.identifier): NSManagedObject {
+                SCDataModel_\(raw: str.identifier): NSManagedObject {
                     \(raw: propertyElements)
                 }
-            #endif
-            """
-        ]
+                """
+            ]
+        #else
+            return []
+        #endif
     }
 }

@@ -1,5 +1,5 @@
 // TODO: NSDate, NSDecimalNumber and UUID
-#if canImport(CoreData)
+#if CORE_DATA
     import CoreData
 
     public protocol ColumnType: Sendable {

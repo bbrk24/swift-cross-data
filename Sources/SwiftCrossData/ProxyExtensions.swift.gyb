@@ -34,7 +34,7 @@
                     lhs: ExpressionProxy<${type}>,
                     rhs: ExpressionProxy<${other_type}>
                 ) -> ExpressionProxy<${type}> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "${core_data_function}",
@@ -83,7 +83,7 @@
                 lhs: ExpressionProxy<${type}>,
                 rhs: ExpressionProxy<${type}>
             ) -> ExpressionProxy<${type}> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "${core_data_function}",

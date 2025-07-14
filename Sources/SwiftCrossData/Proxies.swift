@@ -1,6 +1,6 @@
 import Foundation
 
-#if canImport(CoreData)
+#if CORE_DATA
     infix operator <- : AssignmentPrecedence
 #else
     import SQLite
@@ -37,7 +37,7 @@ public struct ExpressionProxy<T: ColumnType> {
         return operand
     }
 
-    #if canImport(CoreData)
+    #if CORE_DATA
         public static func == (
             lhs: ExpressionProxy<T>,
             rhs: ExpressionProxy<T>
@@ -150,7 +150,7 @@ public struct ExpressionProxy<T: ColumnType> {
 
 extension ExpressionProxy where T == String {
     public func lowercased() -> ExpressionProxy<String> {
-        #if canImport(CoreData)
+        #if CORE_DATA
             let functionName = "lowercase"
         #else
             let functionName = "LOWER"
@@ -162,7 +162,7 @@ extension ExpressionProxy where T == String {
     }
 
     public func uppercased() -> ExpressionProxy<String> {
-        #if canImport(CoreData)
+        #if CORE_DATA
             let functionName = "uppercase"
         #else
             let functionName = "UPPER"
@@ -174,7 +174,7 @@ extension ExpressionProxy where T == String {
     }
 
     public func matchesGlob(_ template: ExpressionProxy<String>) -> ExpressionProxy<Bool> {
-        #if canImport(CoreData)
+        #if CORE_DATA
             let globOperator = "LIKE"
         #else
             let globOperator = "GLOB"

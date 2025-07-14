@@ -161,7 +161,7 @@
                     lhs: ExpressionProxy<Int16>,
                     rhs: ExpressionProxy<Int16>
                 ) -> ExpressionProxy<Int16> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "leftshift:by:",
@@ -207,7 +207,7 @@
                     lhs: ExpressionProxy<Int16>,
                     rhs: ExpressionProxy<Int16>
                 ) -> ExpressionProxy<Int16> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "rightshift:by:",
@@ -253,7 +253,7 @@
                     lhs: ExpressionProxy<Int16>,
                     rhs: ExpressionProxy<Int32>
                 ) -> ExpressionProxy<Int16> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "leftshift:by:",
@@ -299,7 +299,7 @@
                     lhs: ExpressionProxy<Int16>,
                     rhs: ExpressionProxy<Int32>
                 ) -> ExpressionProxy<Int16> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "rightshift:by:",
@@ -345,7 +345,7 @@
                     lhs: ExpressionProxy<Int16>,
                     rhs: ExpressionProxy<Int64>
                 ) -> ExpressionProxy<Int16> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "leftshift:by:",
@@ -391,7 +391,7 @@
                     lhs: ExpressionProxy<Int16>,
                     rhs: ExpressionProxy<Int64>
                 ) -> ExpressionProxy<Int16> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "rightshift:by:",
@@ -439,7 +439,7 @@
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
             ) -> ExpressionProxy<Int16> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "modulus:by:",
@@ -485,7 +485,7 @@
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
             ) -> ExpressionProxy<Int16> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "bitwiseAnd:with:",
@@ -531,7 +531,7 @@
                 lhs: ExpressionProxy<Int16>,
                 rhs: ExpressionProxy<Int16>
             ) -> ExpressionProxy<Int16> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "bitwiseOr:with:",
@@ -581,7 +581,7 @@
                     lhs: ExpressionProxy<Int32>,
                     rhs: ExpressionProxy<Int16>
                 ) -> ExpressionProxy<Int32> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "leftshift:by:",
@@ -627,7 +627,7 @@
                     lhs: ExpressionProxy<Int32>,
                     rhs: ExpressionProxy<Int16>
                 ) -> ExpressionProxy<Int32> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "rightshift:by:",
@@ -673,7 +673,7 @@
                     lhs: ExpressionProxy<Int32>,
                     rhs: ExpressionProxy<Int32>
                 ) -> ExpressionProxy<Int32> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "leftshift:by:",
@@ -719,7 +719,7 @@
                     lhs: ExpressionProxy<Int32>,
                     rhs: ExpressionProxy<Int32>
                 ) -> ExpressionProxy<Int32> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "rightshift:by:",
@@ -765,7 +765,7 @@
                     lhs: ExpressionProxy<Int32>,
                     rhs: ExpressionProxy<Int64>
                 ) -> ExpressionProxy<Int32> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "leftshift:by:",
@@ -811,7 +811,7 @@
                     lhs: ExpressionProxy<Int32>,
                     rhs: ExpressionProxy<Int64>
                 ) -> ExpressionProxy<Int32> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "rightshift:by:",
@@ -859,7 +859,7 @@
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
             ) -> ExpressionProxy<Int32> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "modulus:by:",
@@ -905,7 +905,7 @@
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
             ) -> ExpressionProxy<Int32> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "bitwiseAnd:with:",
@@ -951,7 +951,7 @@
                 lhs: ExpressionProxy<Int32>,
                 rhs: ExpressionProxy<Int32>
             ) -> ExpressionProxy<Int32> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "bitwiseOr:with:",
@@ -1001,7 +1001,7 @@
                     lhs: ExpressionProxy<Int64>,
                     rhs: ExpressionProxy<Int16>
                 ) -> ExpressionProxy<Int64> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "leftshift:by:",
@@ -1047,7 +1047,7 @@
                     lhs: ExpressionProxy<Int64>,
                     rhs: ExpressionProxy<Int16>
                 ) -> ExpressionProxy<Int64> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "rightshift:by:",
@@ -1093,7 +1093,7 @@
                     lhs: ExpressionProxy<Int64>,
                     rhs: ExpressionProxy<Int32>
                 ) -> ExpressionProxy<Int64> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "leftshift:by:",
@@ -1139,7 +1139,7 @@
                     lhs: ExpressionProxy<Int64>,
                     rhs: ExpressionProxy<Int32>
                 ) -> ExpressionProxy<Int64> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "rightshift:by:",
@@ -1185,7 +1185,7 @@
                     lhs: ExpressionProxy<Int64>,
                     rhs: ExpressionProxy<Int64>
                 ) -> ExpressionProxy<Int64> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "leftshift:by:",
@@ -1231,7 +1231,7 @@
                     lhs: ExpressionProxy<Int64>,
                     rhs: ExpressionProxy<Int64>
                 ) -> ExpressionProxy<Int64> {
-                    #if canImport(CoreData)
+                    #if CORE_DATA
                         .init(
                             expression: .functionCall(
                                 functionName: "rightshift:by:",
@@ -1279,7 +1279,7 @@
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
             ) -> ExpressionProxy<Int64> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "modulus:by:",
@@ -1325,7 +1325,7 @@
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
             ) -> ExpressionProxy<Int64> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "bitwiseAnd:with:",
@@ -1371,7 +1371,7 @@
                 lhs: ExpressionProxy<Int64>,
                 rhs: ExpressionProxy<Int64>
             ) -> ExpressionProxy<Int64> {
-                #if canImport(CoreData)
+                #if CORE_DATA
                     .init(
                         expression: .functionCall(
                             functionName: "bitwiseOr:with:",

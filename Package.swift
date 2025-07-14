@@ -1,14 +1,37 @@
 // swift-tools-version: 6.0
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 import CompilerPluginSupport
+import Foundation
+
+let backend: String?
+switch ProcessInfo.processInfo.environment["SCD_BACKEND"] {
+case "SQLite":
+    backend = "SQLite"
+case "CoreData":
+    backend = "CoreData"
+case .some(let x):
+    print("Unrecognized backend \(x). Using default backend for platform.")
+    fallthrough
+case nil:
+    #if os(macOS) // Includes compiling for iOS etc
+        backend = "CoreData"
+    #else
+        backend = "SQLite"
+    #endif
+}
+
+var dependencies: [Target.Dependency] = ["SwiftCrossDataMacros"]
+if backend == "SQLite" {
+    dependencies.append(.product(name: "SQLite", package: "SQLite.swift"))
+}
+
+let swiftSettings: [SwiftSetting] = backend == "CoreData" ? [.define("CORE_DATA")] : []
 
 let package = Package(
     name: "SwiftCrossData",
     platforms: [.macOS(.v10_15), .iOS(.v13), .tvOS(.v13), .macCatalyst(.v13)],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "SwiftCrossData",
             targets: ["SwiftCrossData"]
@@ -30,9 +53,6 @@ let package = Package(
         ),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
-        // Macro implementation that performs the source transformation of a macro.
         .macro(
             name: "SwiftCrossDataMacros",
             dependencies: [
@@ -41,24 +61,12 @@ let package = Package(
                 .product(name: "MacroToolkit", package: "swift-macro-toolkit"),
             ]
         ),
-
-        // Library that exposes a macro as part of its API, which is used in client programs.
         .target(
             name: "SwiftCrossData",
-            dependencies: [
-                "SwiftCrossDataMacros",
-                .product(
-                    name: "SQLite",
-                    package: "SQLite.swift",
-                    condition: .when(platforms: [.linux, .windows])
-                ),
-            ]
+            dependencies: dependencies,
+            swiftSettings: swiftSettings
         ),
-
-        // A client of the library, which is able to use the macro in its own code.
         .executableTarget(name: "SwiftCrossDataClient", dependencies: ["SwiftCrossData"]),
-
-        // A test target used to develop the macro implementation.
         .testTarget(
             name: "SwiftCrossDataTests",
             dependencies: [

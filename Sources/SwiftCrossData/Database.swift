@@ -1,4 +1,4 @@
-#if canImport(CoreData)
+#if CORE_DATA
     @_exported import CoreData
 #else
     import SQLite
@@ -69,7 +69,7 @@ func createSetter<M: Model, T: ColumnType>(
 }
 
 public struct Database: Sendable {
-    #if canImport(CoreData)
+    #if CORE_DATA
     #else
         let connectionWrapper: ConnectionWrapper
     #endif
@@ -78,7 +78,7 @@ public struct Database: Sendable {
         models: [any Model.Type],
         dbFileName: String
     ) throws {
-        #if canImport(CoreData)
+        #if CORE_DATA
             fatalError("TODO")
         #else
             let connection = try Connection(.uri(dbFileName))
@@ -130,7 +130,7 @@ public struct Database: Sendable {
 
     public func insert<S: Sequence>(_ values: sending S) async throws -> [S.Element]
     where S.Element: Model {
-        #if canImport(CoreData)
+        #if CORE_DATA
             fatalError("TODO")
         #else
             let table = Table(S.Element.getTableName())
@@ -165,7 +165,7 @@ public struct Database: Sendable {
     }
 
     public func delete<M: Model>(_ model: consuming M) async throws {
-        #if canImport(CoreData)
+        #if CORE_DATA
             fatalError("TODO")
         #else
             try await connectionWrapper.withConnection { conn in
@@ -181,7 +181,7 @@ public struct Database: Sendable {
     @discardableResult
     public func delete<S: Sequence>(_ models: sending S) async throws -> Int
     where S.Element: Model {
-        #if canImport(CoreData)
+        #if CORE_DATA
             fatalError("TODO")
         #else
             try await connectionWrapper.withConnection { conn in
@@ -201,7 +201,7 @@ public struct Database: Sendable {
     ) async throws -> Int {
         let expression = predicate(.init()).expression
 
-        #if canImport(CoreData)
+        #if CORE_DATA
             fatalError("TODO")
         #else
             let (whereClause, arguments) = QueryWrapper<M>.compile(expression: expression)
@@ -227,7 +227,7 @@ public struct Database: Sendable {
         var mutationProxy = MutableTableProxy<T>()
         updater(&mutationProxy)
 
-        #if canImport(CoreData)
+        #if CORE_DATA
             fatalError("TODO")
         #else
             var arguments: [Binding?] = []
@@ -295,7 +295,7 @@ public struct QueryWrapper<T: Model>: Sendable {
     let limit: Int?
     let offset: Int?
 
-    #if canImport(CoreData)
+    #if CORE_DATA
         public func count() async throws -> Int64 {
             fatalError("TODO")
         }
