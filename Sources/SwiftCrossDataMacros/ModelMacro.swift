@@ -20,13 +20,16 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         let properties = str.properties.filter(\.isStored)
 
         var propertyElements = ""
-        var initStatements = ""
+        var sqliteInitStatements = ""
+        var coreDataInitStatements = ""
 
         for property in properties {
             let columnName = property.identifier
 
-            initStatements +=
+            sqliteInitStatements +=
                 "self.\(property.identifier) = try SwiftCrossData.decodeRowValue(row, \"\(columnName)\")\n"
+
+            coreDataInitStatements += "self.\(property.identifier) = managedObject.\(columnName)\n"
 
             if let initialValue = property.initialValue {
                 propertyElements += #"""
@@ -59,11 +62,22 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                 }
                 """
 
-                #if !CORE_DATA
+                """
+                public typealias ManagedObjectType = SCDataModel_\(raw: str.identifier)
+                """
+
+                #if CORE_DATA
+                    """
+                    public init(managedObject: Self.ManagedObjectType) {
+                        self.managedObject = managedObject
+                        \(raw: coreDataInitStatements)
+                    }
+                    """
+                #else
                     """
                     public init(row: SwiftCrossData.Row) throws {
                         self.rowid = try SwiftCrossData.decodeRowValue(row, "rowid")
-                        \(raw: initStatements)
+                        \(raw: sqliteInitStatements)
                     }
                     """
                 #endif
@@ -78,7 +92,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         #if CORE_DATA
-            return []
+            return ["public nonisolated(unsafe) var managedObject: Self.ManagedObjectType? = nil"]
         #else
             return ["public var rowid: Int64 = -1"]
         #endif
@@ -118,9 +132,6 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                 }
                 propertyElements +=
                     "\n@NSManaged var \(property.identifier): \(type.normalizedDescription)"
-                if let initialValue = property.initialValue {
-                    propertyElements += " = \(initialValue._syntax.description)"
-                }
             }
 
             return [

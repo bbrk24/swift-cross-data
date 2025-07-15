@@ -1,4 +1,10 @@
-@attached(member, names: named(rowid))
+@attached(member, names: named(rowid), named(managedObject))
 @attached(peer, names: prefixed(SCDataModel_))
-@attached(extension, conformances: Model, names: named(properties), named(init))
+@attached(
+    extension,
+    conformances: Model,
+    names: named(properties),
+    named(init),
+    named(ManagedObjectType)
+)
 public macro Model() = #externalMacro(module: "SwiftCrossDataMacros", type: "ModelMacro")

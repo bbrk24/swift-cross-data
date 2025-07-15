@@ -59,7 +59,8 @@ let package = Package(
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
                 .product(name: "MacroToolkit", package: "swift-macro-toolkit"),
-            ]
+            ],
+            swiftSettings: swiftSettings
         ),
         .target(
             name: "SwiftCrossData",

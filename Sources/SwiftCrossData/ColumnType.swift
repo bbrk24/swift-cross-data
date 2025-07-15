@@ -3,88 +3,111 @@
     import CoreData
 
     public protocol ColumnType: Sendable {
-        static var attributeType: NSAttributeDescription.AttributeType { get }
+        static var attributeType: NSAttributeType { get }
         static var isOptional: Bool { get }
+        var asNSObject: NSObject { get }
     }
 
     extension Int16: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
-            .integer16
+        public static var attributeType: NSAttributeType {
+            .integer16AttributeType
         }
 
         public static var isOptional: Bool { false }
+
+        public var asNSObject: NSObject { NSNumber(value: self) }
     }
 
     extension Int32: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
-            .integer32
+        public static var attributeType: NSAttributeType {
+            .integer32AttributeType
         }
 
         public static var isOptional: Bool { false }
+
+        public var asNSObject: NSObject { NSNumber(value: self) }
     }
 
     extension Int64: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
-            .integer64
+        public static var attributeType: NSAttributeType {
+            .integer64AttributeType
         }
 
         public static var isOptional: Bool { false }
+
+        public var asNSObject: NSObject { NSNumber(value: self) }
     }
 
     extension Double: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
-            .double
+        public static var attributeType: NSAttributeType {
+            .doubleAttributeType
         }
 
         public static var isOptional: Bool { false }
+
+        public var asNSObject: NSObject { NSNumber(value: self) }
     }
 
     extension Float: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
-            .float
+        public static var attributeType: NSAttributeType {
+            .floatAttributeType
         }
 
         public static var isOptional: Bool { false }
+
+        public var asNSObject: NSObject { NSNumber(value: self) }
     }
 
     extension Bool: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
-            .boolean
+        public static var attributeType: NSAttributeType {
+            .booleanAttributeType
         }
 
         public static var isOptional: Bool { false }
+
+        public var asNSObject: NSObject { NSNumber(value: self) }
     }
 
     extension URL: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
-            .uri
+        public static var attributeType: NSAttributeType {
+            .URIAttributeType
         }
 
         public static var isOptional: Bool { false }
+
+        public var asNSObject: NSObject { self as NSURL }
     }
 
     extension String: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
-            .string
+        public static var attributeType: NSAttributeType {
+            .stringAttributeType
         }
 
         public static var isOptional: Bool { false }
+
+        public var asNSObject: NSObject { self as NSString }
     }
 
     extension Data: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
-            .binaryData
+        public static var attributeType: NSAttributeType {
+            .binaryDataAttributeType
         }
 
         public static var isOptional: Bool { false }
+
+        public var asNSObject: NSObject { self as NSData }
     }
 
     extension Optional: ColumnType where Wrapped: ColumnType {
-        public static var attributeType: NSAttributeDescription.AttributeType {
+        public static var attributeType: NSAttributeType {
             Wrapped.attributeType
         }
 
         public static var isOptional: Bool { true }
+
+        public var asNSObject: NSObject {
+            self?.asNSObject ?? NSNull()
+        }
     }
 #else
     import Foundation
