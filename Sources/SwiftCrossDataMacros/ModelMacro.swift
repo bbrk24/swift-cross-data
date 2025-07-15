@@ -29,7 +29,8 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
             sqliteInitStatements +=
                 "self.\(property.identifier) = try SwiftCrossData.decodeRowValue(row, \"\(columnName)\")\n"
 
-            coreDataInitStatements += "self.\(property.identifier) = managedObject.\(columnName)\n"
+            coreDataInitStatements +=
+                "self.\(property.identifier) = .fromScalar(managedObject.\(columnName))\n"
 
             if let initialValue = property.initialValue {
                 propertyElements += #"""
@@ -62,11 +63,11 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                 }
                 """
 
-                """
-                public typealias ManagedObjectType = SCDataModel_\(raw: str.identifier)
-                """
-
                 #if CORE_DATA
+                    """
+                    public typealias ManagedObjectType = SCDataModel_\(raw: str.identifier)
+                    """
+
                     """
                     public init(managedObject: Self.ManagedObjectType) {
                         self.managedObject = managedObject
@@ -131,7 +132,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                     continue
                 }
                 propertyElements +=
-                    "\n@NSManaged var \(property.identifier): \(type.normalizedDescription)"
+                    "\n@NSManaged var \(property.identifier): \(type.normalizedDescription).ScalarType"
             }
 
             return [

@@ -3,9 +3,48 @@
     import CoreData
 
     public protocol ColumnType: Sendable {
+        /// The attribute type used to initialize the NSEntityDescription.
         static var attributeType: NSAttributeType { get }
+        /// Whether the type may include `nil` values.
         static var isOptional: Bool { get }
+        /// Convert `self` to an argument for a formatted `NSPredicate`.
         var asNSObject: NSObject { get }
+
+        /// The type used to represent this value in `@NSManaged` properties.
+        associatedtype ScalarType = Self
+        /// The type used to represent this value in optional `@NSManaged` properties.
+        ///
+        /// For numeric types, this is `NSNumber`, since `@NSManaged` properties cannot be optional
+        /// primitives.
+        associatedtype NonScalarType = ScalarType
+        /// Convert a value from ``ScalarType``.
+        static func fromScalar(_ scalar: ScalarType) -> Self
+        /// Convert a value from ``NonScalarType``.
+        static func fromNonScalar(_ nonScalar: NonScalarType) -> Self
+        /// Convert `self` to a scalar value for use with `NSManagedObject.setValue(_:forKey:)`.
+        func toScalar() -> ScalarType
+        /// Convert `self` to `NonScalarType`.
+        func toNonScalar() -> NonScalarType
+    }
+
+    extension ColumnType where ScalarType == Self {
+        public static func fromScalar(_ scalar: ScalarType) -> Self {
+            scalar
+        }
+
+        public func toScalar() -> ScalarType {
+            self
+        }
+    }
+
+    extension ColumnType where NonScalarType == Self {
+        public static func fromNonScalar(_ nonScalar: NonScalarType) -> Self {
+            nonScalar
+        }
+
+        public func toNonScalar() -> NonScalarType {
+            self
+        }
     }
 
     extension Int16: ColumnType {
@@ -16,6 +55,16 @@
         public static var isOptional: Bool { false }
 
         public var asNSObject: NSObject { NSNumber(value: self) }
+
+        public typealias NonScalarType = NSNumber
+
+        public static func fromNonScalar(_ nonScalar: NSNumber) -> Int16 {
+            nonScalar.int16Value
+        }
+
+        public func toNonScalar() -> NonScalarType {
+            .init(value: self)
+        }
     }
 
     extension Int32: ColumnType {
@@ -26,6 +75,16 @@
         public static var isOptional: Bool { false }
 
         public var asNSObject: NSObject { NSNumber(value: self) }
+
+        public typealias NonScalarType = NSNumber
+
+        public static func fromNonScalar(_ nonScalar: NSNumber) -> Int32 {
+            nonScalar.int32Value
+        }
+
+        public func toNonScalar() -> NonScalarType {
+            .init(value: self)
+        }
     }
 
     extension Int64: ColumnType {
@@ -36,6 +95,16 @@
         public static var isOptional: Bool { false }
 
         public var asNSObject: NSObject { NSNumber(value: self) }
+
+        public typealias NonScalarType = NSNumber
+
+        public static func fromNonScalar(_ nonScalar: NSNumber) -> Int64 {
+            nonScalar.int64Value
+        }
+
+        public func toNonScalar() -> NonScalarType {
+            .init(value: self)
+        }
     }
 
     extension Double: ColumnType {
@@ -46,6 +115,16 @@
         public static var isOptional: Bool { false }
 
         public var asNSObject: NSObject { NSNumber(value: self) }
+
+        public typealias NonScalarType = NSNumber
+
+        public static func fromNonScalar(_ nonScalar: NSNumber) -> Double {
+            nonScalar.doubleValue
+        }
+
+        public func toNonScalar() -> NonScalarType {
+            .init(value: self)
+        }
     }
 
     extension Float: ColumnType {
@@ -56,6 +135,16 @@
         public static var isOptional: Bool { false }
 
         public var asNSObject: NSObject { NSNumber(value: self) }
+
+        public typealias NonScalarType = NSNumber
+
+        public static func fromNonScalar(_ nonScalar: NSNumber) -> Float {
+            nonScalar.floatValue
+        }
+
+        public func toNonScalar() -> NonScalarType {
+            .init(value: self)
+        }
     }
 
     extension Bool: ColumnType {
@@ -66,6 +155,16 @@
         public static var isOptional: Bool { false }
 
         public var asNSObject: NSObject { NSNumber(value: self) }
+
+        public typealias NonScalarType = NSNumber
+
+        public static func fromNonScalar(_ nonScalar: NSNumber) -> Bool {
+            nonScalar.boolValue
+        }
+
+        public func toNonScalar() -> NonScalarType {
+            .init(value: self)
+        }
     }
 
     extension URL: ColumnType {
@@ -107,6 +206,24 @@
 
         public var asNSObject: NSObject {
             self?.asNSObject ?? NSNull()
+        }
+
+        public typealias ScalarType = Wrapped.NonScalarType?
+        public typealias NonScalarType = Never
+
+        public static func fromScalar(_ scalar: Wrapped.NonScalarType?) -> Wrapped? {
+            scalar.map(Wrapped.fromNonScalar(_:))
+        }
+
+        public static func fromNonScalar(_ nonScalar: Never) -> Wrapped? {
+        }
+
+        public func toScalar() -> Wrapped.NonScalarType? {
+            self.map { $0.toNonScalar() }
+        }
+
+        public func toNonScalar() -> Never {
+            preconditionFailure("Don't nest optionals")
         }
     }
 #else

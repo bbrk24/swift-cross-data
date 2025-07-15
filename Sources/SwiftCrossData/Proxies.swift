@@ -17,8 +17,8 @@ enum SqlExpression: Sendable {
     case functionCall(functionName: String, arguments: [SqlExpression])
     indirect case cast(
         expression: SqlExpression,
-        sourceType: ColumnType.Type,
-        destinationType: ColumnType.Type
+        sourceType: any ColumnType.Type,
+        destinationType: any ColumnType.Type
     )
     case literal(value: any ColumnType)
 }

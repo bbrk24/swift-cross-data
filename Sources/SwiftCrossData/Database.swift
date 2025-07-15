@@ -206,7 +206,7 @@ public struct Database: @unchecked Sendable {
 
                         for property in S.Element.properties {
                             model.setValue(
-                                value[keyPath: property.keyPath],
+                                (value[keyPath: property.keyPath] as! any ColumnType).toScalar(),
                                 forKey: property.columnName
                             )
                         }
