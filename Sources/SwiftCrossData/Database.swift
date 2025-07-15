@@ -514,24 +514,30 @@ public struct QueryWrapper<T: Model>: Sendable {
         }
 
         public func count() async throws -> Int64 {
-            // TODO
-            Int64(try await collect().count)
+            let (format, arguments) = Self.compile(expression: self.expression)
+
+            let request = NSFetchRequest<T.ManagedObjectType>(entityName: T.getTableName())
+            request.predicate = NSPredicate(format: format, argumentArray: arguments)
+            request.fetchOffset = offset ?? 0
+            request.resultType = .countResultType
+
+            if let limit {
+                request.fetchLimit = limit
+            }
+
+            return try await db.context.performAsync {
+                let result = try db.context.count(for: request)
+                return Int64(result)
+            }
         }
 
         public func collect<C: RangeReplaceableCollection<T> & Sendable>(
             as _: C.Type
         ) async throws -> C {
+            let (format, arguments) = Self.compile(expression: self.expression)
 
             let request = NSFetchRequest<T.ManagedObjectType>(entityName: T.getTableName())
-
-            if case .literal(let value) = expression, let value = value as? Bool, value {
-                // nothing
-            } else {
-                let (format, arguments) = Self.compile(expression: self.expression)
-                request.predicate = NSPredicate(format: format, argumentArray: arguments)
-            }
-
-            request.fetchLimit = limit ?? .max
+            request.predicate = NSPredicate(format: format, argumentArray: arguments)
             request.sortDescriptors = sortFields.map {
                 NSSortDescriptor(
                     key: T.getColumnName(forKeyPath: $0.keyPath),
@@ -539,6 +545,11 @@ public struct QueryWrapper<T: Model>: Sendable {
                 )
             }
             request.fetchOffset = offset ?? 0
+            request.returnsObjectsAsFaults = false
+
+            if let limit {
+                request.fetchLimit = limit
+            }
 
             return try await db.context.performAsync {
                 let array = try db.context.fetch(request)
