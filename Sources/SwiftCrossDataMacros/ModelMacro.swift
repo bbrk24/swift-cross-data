@@ -4,6 +4,7 @@ import SwiftDiagnostics
 import MacroToolkit
 
 public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
+    // MARK: Extension Macro
     public static func expansion(
         of node: AttributeSyntax,
         attachedTo declaration: some DeclGroupSyntax,
@@ -22,8 +23,13 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         var propertyElements = ""
         var sqliteInitStatements = ""
         var coreDataInitStatements = ""
+        var debugDescriptionPieces: [String] = []
 
         for property in properties {
+            if property.identifier == "debugDescription" {
+                continue
+            }
+
             let columnName = property.identifier
 
             sqliteInitStatements +=
@@ -31,6 +37,10 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
 
             coreDataInitStatements +=
                 "self.\(property.identifier) = .fromScalar(managedObject.\(columnName))\n"
+
+            debugDescriptionPieces.append(
+                #"\#(property.identifier): \(Swift.String(reflecting: self.\#(property.identifier)))"#
+            )
 
             if let initialValue = property.initialValue {
                 propertyElements += #"""
@@ -63,6 +73,14 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                 }
                 """
 
+                if !str.properties.contains(where: { $0.identifier == "debugDescription" }) {
+                    #"""
+                    public var debugDescription: Swift.String {
+                        "\(Self.self)(\#(raw: debugDescriptionPieces.joined(separator: ", ")))"
+                    }
+                    """#
+                }
+
                 #if CORE_DATA
                     """
                     public typealias ManagedObjectType = SCDataModel_\(raw: str.identifier)
@@ -86,6 +104,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         ]
     }
 
+    // MARK: Member Macro
     public static func expansion(
         of node: AttributeSyntax,
         providingMembersOf declaration: some DeclGroupSyntax,
@@ -99,6 +118,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         #endif
     }
 
+    // MARK: Peer Macro
     public static func expansion(
         of node: SwiftSyntax.AttributeSyntax,
         providingPeersOf declaration: some SwiftSyntax.DeclSyntaxProtocol,

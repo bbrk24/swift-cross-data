@@ -4,7 +4,7 @@ import PackageDescription
 import CompilerPluginSupport
 import Foundation
 
-let backend: String?
+let backend: String
 switch ProcessInfo.processInfo.environment["SCD_BACKEND"] {
 case "SQLite":
     backend = "SQLite"

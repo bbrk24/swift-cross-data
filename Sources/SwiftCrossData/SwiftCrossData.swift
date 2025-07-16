@@ -5,6 +5,7 @@
     conformances: Model,
     names: named(properties),
     named(init),
-    named(ManagedObjectType)
+    named(ManagedObjectType),
+    named(debugDescription)
 )
 public macro Model() = #externalMacro(module: "SwiftCrossDataMacros", type: "ModelMacro")
