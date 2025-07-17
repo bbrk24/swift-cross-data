@@ -9,3 +9,7 @@
     named(debugDescription)
 )
 public macro Model() = #externalMacro(module: "SwiftCrossDataMacros", type: "ModelMacro")
+
+@attached(peer)
+public macro ColumnName(_ name: StaticString) =
+    #externalMacro(module: "SwiftCrossDataMacros", type: "ColumnNameMacro")

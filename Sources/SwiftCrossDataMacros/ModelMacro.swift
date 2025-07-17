@@ -103,6 +103,30 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
             && validIdStart.contains(str.first!)
     }
 
+    static func columnName(for property: Property) throws -> String {
+        let columnNameAttrs = property.attributes
+            .compactMap { $0.attribute?.asMacroAttribute }
+            .filter { $0.name.normalizedDescription == "ColumnName" }
+
+        if columnNameAttrs.count > 1 {
+            throw DiagnosticError(description: "Property may only have one ColumnName attribute")
+        }
+
+        if let argument = columnNameAttrs.first?.arguments.first?.expr,
+            let stringLiteral = StringLiteral(argument),
+            let value = stringLiteral.value
+        {
+            return value
+        }
+
+        var propertyName = property.identifier
+        if propertyName.first == "`" && propertyName.last == "`" {
+            propertyName.removeFirst()
+            propertyName.removeLast()
+        }
+        return propertyName
+    }
+
     // MARK: Extension Macro
     public static func expansion(
         of node: AttributeSyntax,
@@ -135,7 +159,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                 continue
             }
 
-            let columnName = propertyName
+            let columnName = try columnName(for: property)
 
             if objcInvalidColumnNames.contains(columnName) {
                 context.diagnose(
@@ -282,7 +306,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                     continue
                 }
 
-                let columnName = propertyName
+                let columnName = try columnName(for: property)
 
                 guard let type = property.type else {
                     context.diagnose(
