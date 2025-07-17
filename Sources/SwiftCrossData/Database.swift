@@ -462,20 +462,47 @@ public struct QueryWrapper<T: Model>: Sendable {
         ) -> (String, [NSObject]) {
             switch expression {
             case .column(let name):
-                return ("%K", [name as NSString])
-            case .unaryOperator(let operation, let expression, let isPrefix):
-                let (inner, args) = compile(expression: expression)
+                return (forExpression ? "%K" : "(%K = TRUE)", [name as NSString])
+            case .unaryOperator(let operation, let expression, let isPrefix, let isExpression):
+                let (inner, args) = compile(expression: expression, forExpression: isExpression)
 
-                if isPrefix {
-                    return ("(\(operation)\(inner))", args)
-                } else {
-                    return ("(\(inner)\(operation))", args)
+                let exprString = isPrefix ? "\(operation)\(inner)" : "\(inner)\(operation)"
+
+                switch (forExpression, isExpression) {
+                case (false, true):
+                    return ("((\(exprString)) = TRUE)", args)
+                case (true, false):
+                    return ("TERNARY(\(exprString), TRUE, FALSE)", args)
+                default:
+                    return ("(\(exprString))", args)
                 }
-            case .binaryOperator(let operation, let lhs, let rhs):
-                let (lhsInner, lhsArgs) = compile(expression: lhs)
-                let (rhsInner, rhsArgs) = compile(expression: rhs)
+            case .binaryOperator(
+                let operation,
+                let lhs,
+                let rhs,
+                let isExpression,
+                let childrenAreExpressions
+            ):
+                let (lhsInner, lhsArgs) = compile(
+                    expression: lhs,
+                    forExpression: childrenAreExpressions
+                )
+                let (rhsInner, rhsArgs) = compile(
+                    expression: rhs,
+                    forExpression: childrenAreExpressions
+                )
 
-                return ("(\(lhsInner) \(operation) \(rhsInner))", lhsArgs + rhsArgs)
+                let args = lhsArgs + rhsArgs
+                let exprString = "\(lhsInner) \(operation) \(rhsInner)"
+
+                switch (forExpression, isExpression) {
+                case (false, true):
+                    return ("((\(exprString)) = TRUE)", args)
+                case (true, false):
+                    return ("TERNARY(\(exprString), TRUE, FALSE)", args)
+                default:
+                    return ("(\(exprString))", args)
+                }
             case .functionCall(let functionName, let arguments):
                 var output = functionName + "("
                 var varargs: [NSObject] = []
@@ -494,7 +521,7 @@ public struct QueryWrapper<T: Model>: Sendable {
                 }
                 output += ")"
 
-                return (output, varargs)
+                return (forExpression ? output : "(\(output) = TRUE)", varargs)
             case .cast(let expression, let sourceType, let destinationType):
                 if sourceType.attributeType == destinationType.attributeType {
                     return compile(expression: expression, forExpression: forExpression)
@@ -569,7 +596,7 @@ public struct QueryWrapper<T: Model>: Sendable {
             case .column(let name):
                 // generic argument doesn't matter
                 return (SQLite.Expression<Int>(name).description, [])
-            case .unaryOperator(let operation, let expression, let isPrefix):
+            case .unaryOperator(let operation, let expression, let isPrefix, isExpression: _):
                 let (inner, args) = compile(expression: expression)
 
                 if isPrefix {
@@ -577,7 +604,13 @@ public struct QueryWrapper<T: Model>: Sendable {
                 } else {
                     return ("(\(inner)\(operation))", args)
                 }
-            case .binaryOperator(let operation, let lhs, let rhs):
+            case .binaryOperator(
+                let operation,
+                let lhs,
+                let rhs,
+                isExpression: _,
+                childrenAreExpressions: _
+            ):
                 let (lhsInner, lhsArgs) = compile(expression: lhs)
                 let (rhsInner, rhsArgs) = compile(expression: rhs)
 

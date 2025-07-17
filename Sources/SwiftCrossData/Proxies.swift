@@ -8,11 +8,18 @@ import Foundation
 
 enum SqlExpression: Sendable {
     case column(name: String)
-    indirect case unaryOperator(operation: String, expression: SqlExpression, isPrefix: Bool = true)
+    indirect case unaryOperator(
+        operation: String,
+        expression: SqlExpression,
+        isPrefix: Bool = true,
+        isExpression: Bool = true
+    )
     indirect case binaryOperator(
         operation: String,
         lhs: SqlExpression,
-        rhs: SqlExpression
+        rhs: SqlExpression,
+        isExpression: Bool = true,
+        childrenAreExpressions: Bool = true
     )
     case functionCall(functionName: String, arguments: [SqlExpression])
     indirect case cast(
@@ -46,7 +53,9 @@ public struct ExpressionProxy<T: ColumnType> {
                 expression: .binaryOperator(
                     operation: "=",
                     lhs: lhs.expression,
-                    rhs: rhs.expression
+                    rhs: rhs.expression,
+                    isExpression: false,
+                    childrenAreExpressions: true
                 )
             )
         }
@@ -58,7 +67,9 @@ public struct ExpressionProxy<T: ColumnType> {
                 expression: .binaryOperator(
                     operation: "!=",
                     lhs: lhs.expression,
-                    rhs: rhs.expression
+                    rhs: rhs.expression,
+                    isExpression: false,
+                    childrenAreExpressions: true
                 )
             )
         }
@@ -184,7 +195,9 @@ extension ExpressionProxy where T == String {
             expression: .binaryOperator(
                 operation: globOperator,
                 lhs: self.expression,
-                rhs: template.expression
+                rhs: template.expression,
+                isExpression: false,
+                childrenAreExpressions: true
             )
         )
     }
@@ -214,7 +227,13 @@ extension ExpressionProxy {
 
 extension ExpressionProxy where T == Bool {
     public static prefix func ! (operand: ExpressionProxy<Bool>) -> ExpressionProxy<Bool> {
-        .init(expression: .unaryOperator(operation: "NOT ", expression: operand.expression))
+        .init(
+            expression: .unaryOperator(
+                operation: "NOT ",
+                expression: operand.expression,
+                isExpression: false
+            )
+        )
     }
 
     public static func && (
@@ -222,7 +241,13 @@ extension ExpressionProxy where T == Bool {
         rhs: ExpressionProxy<Bool>
     ) -> ExpressionProxy<Bool> {
         .init(
-            expression: .binaryOperator(operation: "AND", lhs: lhs.expression, rhs: rhs.expression)
+            expression: .binaryOperator(
+                operation: "AND",
+                lhs: lhs.expression,
+                rhs: rhs.expression,
+                isExpression: false,
+                childrenAreExpressions: false
+            )
         )
     }
     public static func && (lhs: ExpressionProxy<Bool>, rhs: Bool) -> ExpressionProxy<Bool> {
@@ -245,7 +270,13 @@ extension ExpressionProxy where T == Bool {
         rhs: ExpressionProxy<Bool>
     ) -> ExpressionProxy<Bool> {
         .init(
-            expression: .binaryOperator(operation: "OR", lhs: lhs.expression, rhs: rhs.expression)
+            expression: .binaryOperator(
+                operation: "OR",
+                lhs: lhs.expression,
+                rhs: rhs.expression,
+                isExpression: false,
+                childrenAreExpressions: false
+            )
         )
     }
     public static func || (lhs: ExpressionProxy<Bool>, rhs: Bool) -> ExpressionProxy<Bool> {

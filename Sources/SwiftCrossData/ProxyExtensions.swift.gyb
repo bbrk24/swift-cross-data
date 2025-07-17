@@ -188,7 +188,9 @@
                     expression: .binaryOperator(
                         operation: "${operator}",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }

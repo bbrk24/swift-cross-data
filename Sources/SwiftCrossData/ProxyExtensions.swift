@@ -1587,7 +1587,9 @@
                     expression: .binaryOperator(
                         operation: "<",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -1612,7 +1614,9 @@
                     expression: .binaryOperator(
                         operation: ">",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -1637,7 +1641,9 @@
                     expression: .binaryOperator(
                         operation: "<=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -1662,7 +1668,9 @@
                     expression: .binaryOperator(
                         operation: ">=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -1678,7 +1686,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 210)
     }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 132)
     extension ExpressionProxy where T == Int32 {
@@ -1851,7 +1859,9 @@
                     expression: .binaryOperator(
                         operation: "<",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -1876,7 +1886,9 @@
                     expression: .binaryOperator(
                         operation: ">",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -1901,7 +1913,9 @@
                     expression: .binaryOperator(
                         operation: "<=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -1926,7 +1940,9 @@
                     expression: .binaryOperator(
                         operation: ">=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -1942,7 +1958,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 210)
     }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 132)
     extension ExpressionProxy where T == Int64 {
@@ -2115,7 +2131,9 @@
                     expression: .binaryOperator(
                         operation: "<",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2140,7 +2158,9 @@
                     expression: .binaryOperator(
                         operation: ">",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2165,7 +2185,9 @@
                     expression: .binaryOperator(
                         operation: "<=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2190,7 +2212,9 @@
                     expression: .binaryOperator(
                         operation: ">=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2206,7 +2230,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 210)
     }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 132)
     extension ExpressionProxy where T == Float {
@@ -2379,7 +2403,9 @@
                     expression: .binaryOperator(
                         operation: "<",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2404,7 +2430,9 @@
                     expression: .binaryOperator(
                         operation: ">",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2429,7 +2457,9 @@
                     expression: .binaryOperator(
                         operation: "<=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2454,7 +2484,9 @@
                     expression: .binaryOperator(
                         operation: ">=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2470,7 +2502,7 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 210)
     }
 #sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 132)
     extension ExpressionProxy where T == Double {
@@ -2643,7 +2675,9 @@
                     expression: .binaryOperator(
                         operation: "<",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2668,7 +2702,9 @@
                     expression: .binaryOperator(
                         operation: ">",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2693,7 +2729,9 @@
                     expression: .binaryOperator(
                         operation: "<=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2718,7 +2756,9 @@
                     expression: .binaryOperator(
                         operation: ">=",
                         lhs: lhs.expression,
-                        rhs: rhs.expression
+                        rhs: rhs.expression,
+                        isExpression: false,
+                        childrenAreExpressions: true
                     )
                 )
             }
@@ -2734,5 +2774,5 @@
             ) -> ExpressionProxy<Bool> {
                 ExpressionProxy(lhs) >= rhs
             }
-#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 208)
+#sourceLocation(file: "Sources/SwiftCrossData/ProxyExtensions.swift.gyb", line: 210)
     }
