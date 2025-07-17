@@ -82,6 +82,27 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         "accessibilityLineStartPositionFromCurrentSelection",
     ]
 
+    static func isValidCIdentifier(_ str: String) -> Bool {
+        // Taken from https://learn.microsoft.com/en-us/cpp/c-language/lexical-grammar because it's
+        // the most accessible C grammar I could find
+        let validIdStart: Set<Character> = Set(
+            "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        )
+        let validIdChar: Set<Character> = validIdStart.union(Set("0123456789"))
+        let cKeywords: Set<String> = [
+            "auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else",
+            "enum", "extern", "float", "for", "goto", "if", "inline", "int", "long", "register",
+            "restrict", "return", "short", "signed", "sizeof", "static", "struct", "switch",
+            "typedef", "union", "unsigned", "void", "volatile", "while", "_Alignas", "_Alignof",
+            "_Atomic", "_Bool", "_Complex", "_Generic", "_Imaginary", "_Noreturn", "_Static_assert",
+            "_Thread_local",
+        ]
+
+        return !str.isEmpty && !cKeywords.contains(str)
+            && str.allSatisfy(validIdChar.contains(_:))
+            && validIdStart.contains(str.first!)
+    }
+
     // MARK: Extension Macro
     public static func expansion(
         of node: AttributeSyntax,
@@ -104,13 +125,19 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
         var debugDescriptionPieces: [String] = []
 
         for property in properties {
-            if property.identifier == "debugDescription" {
+            var propertyName = property.identifier
+            if propertyName.first == "`" && propertyName.last == "`" {
+                propertyName.removeFirst()
+                propertyName.removeLast()
+            }
+
+            if propertyName == "debugDescription" {
                 continue
             }
 
-            let columnName = property.identifier
+            let columnName = propertyName
 
-            if ModelMacro.objcInvalidColumnNames.contains(columnName) {
+            if objcInvalidColumnNames.contains(columnName) {
                 context.diagnose(
                     Diagnostic(
                         node: property._syntax,
@@ -125,22 +152,37 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                         )
                     )
                 )
+            } else if !isValidCIdentifier(columnName) {
+                context.diagnose(
+                    Diagnostic(
+                        node: property._syntax,
+                        message: Message(
+                            message:
+                                "Column name must be a valid C identifier",
+                            diagnosticID: MessageID(
+                                domain: errorDomain,
+                                id: "InvalidCIdentifier"
+                            ),
+                            severity: .error
+                        )
+                    )
+                )
             }
 
             sqliteInitStatements +=
-                "self.\(property.identifier) = try SwiftCrossData.decodeRowValue(row, \"\(columnName)\")\n"
+                "self.`\(propertyName)` = try SwiftCrossData.decodeRowValue(row, \"\(columnName)\")\n"
 
             coreDataInitStatements +=
-                "self.\(property.identifier) = .fromScalar(managedObject.\(columnName))\n"
+                "self.`\(propertyName)` = .fromScalar(managedObject.`\(columnName)`)\n"
 
             debugDescriptionPieces.append(
-                #"\#(property.identifier): \(Swift.String(reflecting: self.\#(property.identifier)))"#
+                #"\#(propertyName): \(Swift.String(reflecting: self.`\#(propertyName)`))"#
             )
 
             if let initialValue = property.initialValue {
                 propertyElements += #"""
                     .init(
-                        keyPath: \\#(str.identifier).\#(property.identifier),
+                        keyPath: \\#(str.identifier).`\#(propertyName)`,
                         columnName: "\#(columnName)",
                         defaultValue: \#(initialValue._syntax.description)
                     ),
@@ -148,7 +190,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
             } else {
                 propertyElements += #"""
                     .init(
-                        keyPath: \\#(str.identifier).\#(property.identifier),
+                        keyPath: \\#(str.identifier).`\#(propertyName)`,
                         columnName: "\#(columnName)"
                     ),
                     """#
@@ -230,6 +272,18 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
 
             var propertyElements = ""
             for property in properties {
+                var propertyName = property.identifier
+                if propertyName.first == "`" && propertyName.last == "`" {
+                    propertyName.removeFirst()
+                    propertyName.removeLast()
+                }
+
+                if propertyName == "debugDescription" {
+                    continue
+                }
+
+                let columnName = propertyName
+
                 guard let type = property.type else {
                     context.diagnose(
                         Diagnostic(
@@ -247,7 +301,7 @@ public enum ModelMacro: MemberMacro, PeerMacro, ExtensionMacro {
                     continue
                 }
                 propertyElements +=
-                    "\n@NSManaged var \(property.identifier): \(type.normalizedDescription).ScalarType"
+                    "\n@NSManaged var `\(columnName)`: \(type.normalizedDescription).ScalarType"
             }
 
             return [
