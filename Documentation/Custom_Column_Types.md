@@ -37,6 +37,7 @@ public protocol ColumnType: Sendable {
 public protocol ColumnType: Sendable {
     static var attributeType: NSAttributeType { get }
     static var isOptional: Bool { get }
+    static var nsObjectType: NSObject.Type { get }
     var asNSObject: NSObject { get }
     associatedtype ScalarType = Self
     associatedtype NonScalarType = ScalarType
@@ -51,6 +52,8 @@ public protocol ColumnType: Sendable {
 - `asNSObject` is used to convert the value to something that can be put in the argument array when
   initializing an `NSPredicate`. This is used for `UPDATE` statements and the `WHERE` clause of
   `SELECT` statements. If your type is nullable, use `NSNull` to represent null values.
+- `nsObjectType` is the type used for `CAST` expressions. It should generally be the same type that
+  `asNSObject` returns, but this is not enforced.
 - `ScalarType` and `NonScalarType` are the types used to represent the column in `NSManagedObject`
   subclasses when the column is non-nullable and nullable, respectively. These have to be different
   for some types:

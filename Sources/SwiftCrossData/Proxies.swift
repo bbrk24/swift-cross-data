@@ -216,15 +216,6 @@ extension String {
     }
 }
 
-extension ExpressionProxy {
-    public func cast() -> ExpressionProxy<Double> where T == Float {
-        .init(expression: self.expression)
-    }
-    public func cast() -> ExpressionProxy<Float> where T == Double {
-        .init(expression: self.expression)
-    }
-}
-
 extension ExpressionProxy where T == Bool {
     public static prefix func ! (operand: ExpressionProxy<Bool>) -> ExpressionProxy<Bool> {
         .init(

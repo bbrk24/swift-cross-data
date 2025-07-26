@@ -7,6 +7,8 @@
         static var attributeType: NSAttributeType { get }
         /// Whether the type may include `nil` values.
         static var isOptional: Bool { get }
+        /// The type to be used by `CAST` expressions.
+        static var nsObjectType: NSObject.Type { get }
         /// Convert `self` to an argument for a formatted `NSPredicate`.
         var asNSObject: NSObject { get }
 
@@ -54,6 +56,8 @@
 
         public static var isOptional: Bool { false }
 
+        public static var nsObjectType: NSObject.Type { NSNumber.self }
+
         public var asNSObject: NSObject { NSNumber(value: self) }
 
         public typealias NonScalarType = NSNumber
@@ -73,6 +77,8 @@
         }
 
         public static var isOptional: Bool { false }
+
+        public static var nsObjectType: NSObject.Type { NSNumber.self }
 
         public var asNSObject: NSObject { NSNumber(value: self) }
 
@@ -94,6 +100,8 @@
 
         public static var isOptional: Bool { false }
 
+        public static var nsObjectType: NSObject.Type { NSNumber.self }
+
         public var asNSObject: NSObject { NSNumber(value: self) }
 
         public typealias NonScalarType = NSNumber
@@ -113,6 +121,8 @@
         }
 
         public static var isOptional: Bool { false }
+
+        public static var nsObjectType: NSObject.Type { NSNumber.self }
 
         public var asNSObject: NSObject { NSNumber(value: self) }
 
@@ -134,6 +144,8 @@
 
         public static var isOptional: Bool { false }
 
+        public static var nsObjectType: NSObject.Type { NSNumber.self }
+
         public var asNSObject: NSObject { NSNumber(value: self) }
 
         public typealias NonScalarType = NSNumber
@@ -153,6 +165,8 @@
         }
 
         public static var isOptional: Bool { false }
+
+        public static var nsObjectType: NSObject.Type { NSNumber.self }
 
         public var asNSObject: NSObject { NSNumber(value: self) }
 
@@ -174,6 +188,8 @@
 
         public static var isOptional: Bool { false }
 
+        public static var nsObjectType: NSObject.Type { NSURL.self }
+
         public var asNSObject: NSObject { self as NSURL }
     }
 
@@ -183,6 +199,8 @@
         }
 
         public static var isOptional: Bool { false }
+
+        public static var nsObjectType: NSObject.Type { NSString.self }
 
         public var asNSObject: NSObject { self as NSString }
     }
@@ -194,6 +212,8 @@
 
         public static var isOptional: Bool { false }
 
+        public static var nsObjectType: NSObject.Type { NSData.self }
+
         public var asNSObject: NSObject { self as NSData }
     }
 
@@ -203,6 +223,8 @@
         }
 
         public static var isOptional: Bool { true }
+
+        public static var nsObjectType: NSObject.Type { Wrapped.nsObjectType }
 
         public var asNSObject: NSObject {
             self?.asNSObject ?? NSNull()

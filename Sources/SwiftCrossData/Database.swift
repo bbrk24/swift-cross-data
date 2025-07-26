@@ -177,8 +177,9 @@ public struct Database: @unchecked Sendable {
         )
     }
 
+    @inlinable
     public func insert<M: Model>(_ value: consuming M) async throws -> M {
-        return try await insert([value])[0]
+        return try await insert(CollectionOfOne(value))[0]
     }
 
     public func insert<S: Sequence>(_ values: sending S) async throws -> [S.Element]
@@ -260,7 +261,7 @@ public struct Database: @unchecked Sendable {
 
     public func delete<M: Model>(_ model: consuming M) async throws {
         #if CORE_DATA
-            try await delete([model])
+            try await delete(CollectionOfOne(model))
         #else
             try await connectionWrapper.withConnection { conn in
                 _ = try conn.run(
@@ -420,6 +421,62 @@ public struct Database: @unchecked Sendable {
             }
         #endif
     }
+
+    public func update<S: Sequence>(_ values: sending S) async throws
+    where S.Element: Model {
+        #if CORE_DATA
+            try await context.performAsync {
+                do {
+                    for value in values {
+                        guard let model = value.managedObject else {
+                            throw SaveFailedError(
+                                debugDescription: "Model struct \(value) has no managedObject"
+                            )
+                        }
+
+                        for property in S.Element.properties {
+                            model.setValue(
+                                (value[keyPath: property.keyPath] as! any ColumnType).toScalar(),
+                                forKey: property.columnName
+                            )
+                        }
+                    }
+
+                    try context.save()
+                } catch {
+                    context.rollback()
+                    throw error
+                }
+            }
+        #else
+            let table = Table(S.Element.getTableName())
+
+            return try await connectionWrapper.withConnection { conn in
+                try conn.transaction {
+                    for value in values {
+                        let statement = table.where(SQLite.Expression("rowid") == value.rowid)
+                            .update(
+                                S.Element.properties.map {
+                                    createSetter(
+                                        value: value,
+                                        keyPath: $0.keyPath,
+                                        columnType: $0.columnType,
+                                        columnName: $0.columnName
+                                    )
+                                }
+                            )
+
+                        try conn.run(statement)
+                    }
+                }
+            }
+        #endif
+    }
+
+    @inlinable
+    public func update<M: Model>(_ value: borrowing M) async throws {
+        try await update(CollectionOfOne(copy value))
+    }
 }
 
 public enum SortDirection: Sendable, Hashable, BitwiseCopyable {
@@ -523,10 +580,19 @@ public struct QueryWrapper<T: Model>: Sendable {
 
                 return (forExpression ? output : "(\(output) = TRUE)", varargs)
             case .cast(let expression, let sourceType, let destinationType):
-                if sourceType.attributeType == destinationType.attributeType {
+                if sourceType.nsObjectType == destinationType.nsObjectType {
                     return compile(expression: expression, forExpression: forExpression)
                 }
-                fatalError("CoreData CAST is unimplemented")
+
+                let (inner, innerArgs) = compile(expression: expression, forExpression: true)
+
+                let output = "CAST(\(inner), %@)"
+
+                return (
+                    forExpression ? output : "(\(output) = TRUE)",
+                    innerArgs
+                        + CollectionOfOne<NSString>(NSStringFromClass(destinationType.nsObjectType))
+                )
             case .literal(let value):
                 if let value = value as? Bool {
                     if value {
