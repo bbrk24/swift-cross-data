@@ -34,28 +34,65 @@
         }
     }
 
-    func createColumn(type: SqliteTypeName, name: String, builder t: TableBuilder) {
+    func createColumn(
+        type: SqliteTypeName,
+        name: String,
+        builder t: TableBuilder,
+        defaultValue: SqliteValue?
+    ) {
         switch type {
         case .integer:
-            t.column(SQLite.Expression<Int64>(name))
+            if let defaultValue, let intValue = Int64.decode(sqliteValue: defaultValue) {
+                t.column(SQLite.Expression<Int64>(name), defaultValue: intValue)
+            } else {
+                t.column(SQLite.Expression<Int64>(name))
+            }
         case .real:
-            t.column(SQLite.Expression<Double>(name))
+            if let defaultValue, let doubleValue = Double.decode(sqliteValue: defaultValue) {
+                t.column(SQLite.Expression<Double>(name), defaultValue: doubleValue)
+            } else {
+                t.column(SQLite.Expression<Double>(name))
+            }
         case .text:
-            t.column(SQLite.Expression<String>(name))
+            if let defaultValue, let stringValue = String.decode(sqliteValue: defaultValue) {
+                t.column(SQLite.Expression<String>(name), defaultValue: stringValue)
+            } else {
+                t.column(SQLite.Expression<String>(name))
+            }
         case .blob:
-            t.column(SQLite.Expression<Data>(name))
+            if let defaultValue, let dataValue = Data.decode(sqliteValue: defaultValue) {
+                t.column(SQLite.Expression<Data>(name), defaultValue: dataValue)
+            } else {
+                t.column(SQLite.Expression<Data>(name))
+            }
         case .null(let inner):
             switch inner {
             case .integer:
-                t.column(SQLite.Expression<Int64?>(name))
+                if let defaultValue, let intValue = Int64.decode(sqliteValue: defaultValue) {
+                    t.column(SQLite.Expression<Int64?>(name), defaultValue: intValue)
+                } else {
+                    t.column(SQLite.Expression<Int64?>(name))
+                }
             case .real:
-                t.column(SQLite.Expression<Double?>(name))
+                if let defaultValue, let doubleValue = Double.decode(sqliteValue: defaultValue) {
+                    t.column(SQLite.Expression<Double?>(name), defaultValue: doubleValue)
+                } else {
+                    t.column(SQLite.Expression<Double?>(name))
+                }
             case .text:
-                t.column(SQLite.Expression<String?>(name))
+                if let defaultValue, let stringValue = String.decode(sqliteValue: defaultValue) {
+                    t.column(SQLite.Expression<String?>(name), defaultValue: stringValue)
+                } else {
+                    t.column(SQLite.Expression<String?>(name))
+                }
             case .blob:
-                t.column(SQLite.Expression<Data?>(name))
+                if let defaultValue, let dataValue = Data.decode(sqliteValue: defaultValue) {
+                    t.column(SQLite.Expression<Data?>(name), defaultValue: dataValue)
+                } else {
+                    t.column(SQLite.Expression<Data?>(name))
+                }
             case .null(_):
-                createColumn(type: inner, name: name, builder: t)
+                createColumn(type: inner, name: name, builder: t, defaultValue: defaultValue)
             }
         }
     }
@@ -147,7 +184,8 @@ public struct Database: @unchecked Sendable {
                                 createColumn(
                                     type: property.columnType.sqliteTypeName,
                                     name: property.columnName,
-                                    builder: t
+                                    builder: t,
+                                    defaultValue: property.defaultValue?.sqliteValue
                                 )
                             }
                         }

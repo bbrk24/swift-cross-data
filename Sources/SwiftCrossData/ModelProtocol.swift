@@ -65,7 +65,7 @@
 public struct ModelProperty<T> {
     let keyPath: PartialKeyPath<T>
     let columnName: String
-    let defaultValue: Any?
+    let defaultValue: (any ColumnType)?
     let columnType: any ColumnType.Type
 
     public init<PropertyType: ColumnType>(
