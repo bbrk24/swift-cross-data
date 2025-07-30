@@ -87,14 +87,19 @@ You can connect to a database by instantiating `Database`:
 ```swift
 import SwiftCrossData
 
-let db = try Database(models: [User.self], dbFileName: "/path/to/db.sqlite")
+let db = try Database(models: [User.self], dbLocation: location)
 ```
 
 `models` is a list of model struct types representing the tables in the database.
 
-`dbFileName` is the path to the file where the data is stored. If the file does not exist, it is
-created with the specified set of tables. Every table starts empty. Other files may be created in
-the same directory, with names based on this file name -- in this example, you might also see
-`/path/to/db.sqlite-wal`.
+`dbLocation` indicates where the data is stored. `.inMemory` indicates that a temporary database
+should be created in RAM and automatically deleted when the program terminates. All other options
+point to a file -- `.filePath` via a file path as a string, `.url` by a file URL, and
+`.suggestedLocation` by automatically determining an idiomatic location for the current platform.
+
+If `dbLocation` indicates a file that does not exist, it is created with the specified set of
+tables. Every table starts empty. Other files may be created in the same directory, with names based
+on this file name --  for example, if the given location is `.filePath("/path/to/db.sqlite")`, you
+might also see `/path/to/db.sqlite-wal`.
 
 It is not recommended to have multiple `Database` instances pointing at the same file.

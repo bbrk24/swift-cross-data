@@ -5,18 +5,15 @@ struct Foo {
     var name: String
 }
 
-let db = try! Database(models: [Foo.self], dbFileName: "./db.sqlite")
+let db = try! Database(models: [Foo.self], dbLocation: .inMemory)
 
-let count = try! await db.select(from: Foo.self, where: { _ in ExpressionProxy(true) }).count()
-if count < 5 {
-    _ = try! await db.insert([
-        Foo(name: "Alice"),
-        Foo(name: "Bob"),
-        Foo(name: "Charlie"),
-        Foo(name: "David"),
-        Foo(name: "Eve"),
-    ])
-}
+_ = try! await db.insert([
+    Foo(name: "Alice"),
+    Foo(name: "Bob"),
+    Foo(name: "Charlie"),
+    Foo(name: "David"),
+    Foo(name: "Eve"),
+])
 
 print(
     try! await db.update(

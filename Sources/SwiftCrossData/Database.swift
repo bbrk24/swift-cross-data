@@ -130,7 +130,7 @@ public struct Database: @unchecked Sendable {
 
     public init(
         models: [any Model.Type],
-        dbFileName: String
+        dbLocation: DatabaseLocation
     ) throws {
         #if CORE_DATA
             let model = NSManagedObjectModel()
@@ -163,15 +163,29 @@ public struct Database: @unchecked Sendable {
 
             let storeUrl = URL(fileURLWithPath: dbFileName)
 
-            try coordinator.addPersistentStore(
-                ofType: NSSQLiteStoreType,
-                configurationName: nil,
-                at: storeUrl
-            )
+            if dbLocation == .inMemory {
+                try coordinator.addPersistentStore(
+                    ofType: NSInMemoryStoreType,
+                    configurationName: nil,
+                    at: nil
+                )
+            } else {
+                try coordinator.addPersistentStore(
+                    ofType: NSSQLiteStoreType,
+                    configurationName: nil,
+                    at: storeUrl
+                )
+            }
 
             context.persistentStoreCoordinator = coordinator
         #else
-            let connection = try Connection(.uri(dbFileName))
+            let connection =
+                switch dbLocation.value {
+                case .inMemory:
+                    try Connection(.inMemory)
+                case .fileUrl(let url):
+                    try Connection(.uri(url.path))
+                }
 
             for model in models {
                 let table = Table(model.getTableName())
