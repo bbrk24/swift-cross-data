@@ -13,13 +13,16 @@ The method `Database.select` represents SQL `SELECT` statements. These can be us
 values from the database or count how many rows exist matching a certain predicate.
 
 The `select` method itself does not perform any querying. Rather, it returns a query wrapper with
-two methods:
+three methods:
 
 - `count()` performs a query like `SELECT COUNT(*)`, and returns the number of rows that exist
-  matching the criteria given.
+  matching the criteria given. This ignores the `orderBy` if specified as that doesn't affect the
+  result.
 - `collect()` performs a query like `SELECT *`, and returns the contents of the rows that match. You
   may optionally pass a range-replaceable container type in which to store the elements, e.g.
   `collect(as: ContiguousArray.self)`, which defaults to `Array` if not specified.
+- `any()` performs a query like `SELECT EXISTS(...)`, and returns a boolean value accordingly. This
+  ignores the `orderBy` and `limit`, if specified, as they don't affect the result.
 
 ## INSERT
 

@@ -694,6 +694,21 @@ public struct QueryWrapper<T: Model>: Sendable {
                 return result
             }
         }
+
+        public func any() async throws -> Bool {
+            let (format, arguments) = Self.compile(expression: self.expression)
+
+            let request = NSFetchRequest<T.ManagedObjectType>(entityName: T.getTableName())
+            request.predicate = NSPredicate(format: format, argumentArray: arguments)
+            request.fetchOffset = offset ?? 0
+            request.resultType = .countResultType
+            request.fetchLimit = 1
+
+            return try await db.context.performAsync {
+                let result = try db.context.count(for: request)
+                return result > 0
+            }
+        }
     #else
         static func compile(expression: SqlExpression) -> (String, [Binding?]) {
             switch expression {
@@ -844,6 +859,33 @@ public struct QueryWrapper<T: Model>: Sendable {
                 }
 
                 return results
+            }
+        }
+
+        public func any() async throws -> Bool {
+            var (whereClause, arguments) = Self.compile(expression: self.expression)
+
+            let quotedTableName = SQLite.Expression<Int>(T.getTableName()).description
+
+            var queryString =
+                "SELECT EXISTS(SELECT 1 FROM \(quotedTableName) WHERE \(whereClause)"
+
+            if let offset {
+                queryString += " OFFSET ?"
+                arguments.append(offset)
+            }
+
+            queryString += ");"
+
+            return try await db.connectionWrapper.withConnection {
+                [queryString, arguments] (conn) in
+                let query = try conn.prepare(queryString, arguments)
+
+                guard try query.step() else {
+                    throw ReadFailedError()
+                }
+
+                return query.row[0]
             }
         }
     #endif
