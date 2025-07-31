@@ -116,6 +116,10 @@ public struct DatabaseLocation: Sendable, Equatable {
                     attributes: [.posixPermissions: NSNumber(value: 0o700 as Int16)]
                 )
             }
+
+            return .url(
+                directoryUrl.appending(component: fileName, directoryHint: .notDirectory)
+            )
         #elseif os(Windows)
             var directoryUrl =
                 switch dataType {
@@ -141,17 +145,27 @@ public struct DatabaseLocation: Sendable, Equatable {
                     withIntermediateDirectories: false
                 )
             }
+
+            return .url(
+                directoryUrl.appending(component: fileName, directoryHint: .notDirectory)
+            )
         #elseif os(macOS)
-            let directoryUrl =
+            let baseUrl =
                 switch dataType {
                 case .cache:
                     FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-                        .appending(component: appIdentifier, directoryHint: .isDirectory)
                 default:
                     FileManager.default
                         .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-                        .appending(component: appIdentifier, directoryHint: .isDirectory)
                 }
+
+            var allowedCharacters = CharacterSet.urlPathAllowed
+            allowedCharacters.remove("/")
+
+            let directoryUrl = URL(
+                string:
+                    "\(baseUrl.absoluteString)/\(appIdentifier.addingPercentEncoding(withAllowedCharacters: allowedCharacters)!)"
+            )!
 
             if !FileManager.default.fileExists(atPath: directoryUrl.path) {
                 try FileManager.default.createDirectory(
@@ -160,6 +174,13 @@ public struct DatabaseLocation: Sendable, Equatable {
                     attributes: [.posixPermissions: NSNumber(value: 0o755 as Int16)]
                 )
             }
+
+            return .url(
+                URL(
+                    string:
+                        "\(directoryUrl.absoluteString)/\(fileName.addingPercentEncoding(withAllowedCharacters: allowedCharacters)!)"
+                )!
+            )
         #elseif os(iOS) || os(tvOS)
             // Within the sandbox, you're only given access to .cachesDirectory, .documentDirectory,
             // and temporary directories.
@@ -169,12 +190,18 @@ public struct DatabaseLocation: Sendable, Equatable {
                     for: dataType == .cache ? .cachesDirectory : .documentDirectory,
                     in: .userDomainMask
                 )[0]
+
+            var allowedCharacters = CharacterSet.urlPathAllowed
+            allowedCharacters.remove("/")
+
+            return .url(
+                URL(
+                    string:
+                        "\(directoryUrl.absoluteString)/\(fileName.addingPercentEncoding(withAllowedCharacters: allowedCharacters)!)"
+                )!
+            )
         #else
             #error("Unsupported operating system")
         #endif
-
-        return .url(
-            directoryUrl.appending(component: fileName, directoryHint: .notDirectory)
-        )
     }
 }

@@ -124,6 +124,7 @@
 public struct Database: @unchecked Sendable {
     #if CORE_DATA
         let context = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        let isInMemory: Bool
     #else
         let connectionWrapper: ConnectionWrapper
     #endif
@@ -161,20 +162,21 @@ public struct Database: @unchecked Sendable {
 
             let coordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
 
-            let storeUrl = URL(fileURLWithPath: dbFileName)
-
-            if dbLocation == .inMemory {
+            switch dbLocation.value {
+            case .inMemory:
                 try coordinator.addPersistentStore(
                     ofType: NSInMemoryStoreType,
                     configurationName: nil,
                     at: nil
                 )
-            } else {
+                isInMemory = true
+            case .fileUrl(let url):
                 try coordinator.addPersistentStore(
                     ofType: NSSQLiteStoreType,
                     configurationName: nil,
-                    at: storeUrl
+                    at: url
                 )
+                isInMemory = false
             }
 
             context.persistentStoreCoordinator = coordinator
@@ -408,34 +410,72 @@ public struct Database: @unchecked Sendable {
         #if CORE_DATA
             let (format, arguments) = QueryWrapper<T>.compile(expression: expression)
 
-            let request = NSBatchUpdateRequest(entityName: T.getTableName())
-            request.predicate = NSPredicate(format: format, argumentArray: arguments)
+            if isInMemory {
+                let propertiesToUpdate = mutationProxy.columnMap.mapValues {
+                    let (exprString, setterArgs) = QueryWrapper<T>
+                        .compile(expression: $0, forExpression: true)
 
-            request.resultType = .updatedObjectsCountResultType
-            request.propertiesToUpdate = [:]
-
-            for (columnName, expression) in mutationProxy.columnMap {
-                if case .column(name: columnName) = expression {
-                    continue
+                    return NSExpression(
+                        format: exprString,
+                        argumentArray: setterArgs
+                    )
                 }
 
-                let (exprString, setterArgs) = QueryWrapper<T>
-                    .compile(expression: expression, forExpression: true)
+                let request = NSFetchRequest<T.ManagedObjectType>(entityName: T.getTableName())
+                request.predicate = NSPredicate(format: format, argumentArray: arguments)
 
-                request.propertiesToUpdate![columnName] = NSExpression(
-                    format: exprString,
-                    argumentArray: setterArgs
-                )
-            }
+                return try await context.performAsync {
+                    let results = try context.fetch(request)
 
-            return try await context.performAsync {
-                let result = try context.execute(request) as! NSBatchUpdateResult
+                    do {
+                        for result in results {
+                            for (property, expression) in propertiesToUpdate {
+                                result
+                                    .setValue(
+                                        expression.expressionValue(with: result, context: nil),
+                                        forKey: property
+                                    )
+                            }
+                        }
 
-                if context.hasChanges {
-                    try context.save()
+                        try context.save()
+                    } catch {
+                        context.rollback()
+                        throw error
+                    }
+
+                    return results.count
+                }
+            } else {
+                let request = NSBatchUpdateRequest(entityName: T.getTableName())
+                request.predicate = NSPredicate(format: format, argumentArray: arguments)
+
+                request.resultType = .updatedObjectsCountResultType
+                request.propertiesToUpdate = [:]
+
+                for (columnName, expression) in mutationProxy.columnMap {
+                    if case .column(name: columnName) = expression {
+                        continue
+                    }
+
+                    let (exprString, setterArgs) = QueryWrapper<T>
+                        .compile(expression: expression, forExpression: true)
+
+                    request.propertiesToUpdate![columnName] = NSExpression(
+                        format: exprString,
+                        argumentArray: setterArgs
+                    )
                 }
 
-                return result.result as! Int
+                return try await context.performAsync {
+                    let result = try context.execute(request) as! NSBatchUpdateResult
+
+                    if context.hasChanges {
+                        try context.save()
+                    }
+
+                    return result.result as! Int
+                }
             }
         #else
             var arguments: [Binding?] = []
@@ -643,7 +683,9 @@ public struct QueryWrapper<T: Model>: Sendable {
                 return (
                     forExpression ? output : "(\(output) = TRUE)",
                     innerArgs
-                        + CollectionOfOne<NSString>(NSStringFromClass(destinationType.nsObjectType))
+                        + CollectionOfOne(
+                            NSStringFromClass(destinationType.nsObjectType) as NSString
+                        )
                 )
             case .literal(let value):
                 if let value = value as? Bool {
