@@ -1,4 +1,4 @@
-// TODO: NSDate, NSDecimalNumber and UUID
+// TODO: NSDecimalNumber
 #if CORE_DATA
     import CoreData
 
@@ -215,6 +215,58 @@
         public static var nsObjectType: NSObject.Type { NSData.self }
 
         public var asNSObject: NSObject { self as NSData }
+    }
+
+    extension Date: ColumnType {
+        public static var attributeType: NSAttributeType {
+            .dateAttributeType
+        }
+
+        public static var isOptional: Bool { false }
+
+        public static var nsObjectType: NSObject.Type { NSDate.self }
+
+        public var asNSObject: NSObject { self as NSDate }
+
+        public typealias ScalarType = NSDate
+
+        public static func fromScalar(_ scalar: ScalarType) -> Date {
+            scalar as Date
+        }
+
+        public static func fromNonScalar(_ nonScalar: NonScalarType) -> Date {
+            nonScalar as Date
+        }
+
+        public func toScalar() -> ScalarType {
+            self as NSDate
+        }
+
+        public func toNonScalar() -> NonScalarType {
+            self as NSDate
+        }
+    }
+
+    extension UUID: ColumnType {
+        public static var attributeType: NSAttributeType {
+            .UUIDAttributeType
+        }
+
+        public static var isOptional: Bool { false }
+
+        public static var nsObjectType: NSObject.Type { NSUUID.self }
+
+        public var asNSObject: NSObject { self as NSUUID }
+
+        public typealias NonScalarType = NSUUID
+
+        public static func fromNonScalar(_ nonScalar: NonScalarType) -> UUID {
+            nonScalar as UUID
+        }
+
+        public func toNonScalar() -> NonScalarType {
+            self as NSUUID
+        }
     }
 
     extension Optional: ColumnType where Wrapped: ColumnType {
@@ -448,6 +500,48 @@
                 return value
             } else {
                 return nil
+            }
+        }
+    }
+
+    extension Date: ColumnType {
+        private static var sqliteFormatStyle: ISO8601FormatStyle {
+            .iso8601(timeZone: .gmt, includingFractionalSeconds: true, dateTimeSeparator: .space)
+        }
+
+        public static var sqliteTypeName: SqliteTypeName {
+            .text
+        }
+
+        public var sqliteValue: SqliteValue {
+            .text(self.ISO8601Format(Date.sqliteFormatStyle))
+        }
+
+        public static func decode(sqliteValue: SqliteValue) -> Date? {
+            switch sqliteValue {
+            case .text(let string):
+                try? sqliteFormatStyle.parse(string)
+            default:
+                nil
+            }
+        }
+    }
+
+    extension UUID: ColumnType {
+        public static var sqliteTypeName: SqliteTypeName {
+            .text
+        }
+
+        public var sqliteValue: SqliteValue {
+            .text(uuidString)
+        }
+
+        public static func decode(sqliteValue: SqliteValue) -> UUID? {
+            switch sqliteValue {
+            case .text(let string):
+                UUID(uuidString: string)
+            default:
+                nil
             }
         }
     }

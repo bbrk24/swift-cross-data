@@ -286,6 +286,34 @@ extension ExpressionProxy where T == Bool {
     }
 }
 
+extension ExpressionProxy where T == Date {
+    public static var now: ExpressionProxy<Date> {
+        #if CORE_DATA
+            return .init(expression: .functionCall(functionName: "now", arguments: []))
+        #else
+            return .init(
+                expression: .functionCall(
+                    functionName: "DATETIME",
+                    arguments: [.literal(value: "subsec")]
+                )
+            )
+        #endif
+    }
+
+    public var timeIntervalSince1970: ExpressionProxy<Double> {
+        #if CORE_DATA
+            fatalError("TODO")
+        #else
+            return .init(
+                expression: .functionCall(
+                    functionName: "UNIXEPOCH",
+                    arguments: [self.expression, .literal(value: "subsec")]
+                )
+            )
+        #endif
+    }
+}
+
 @dynamicMemberLookup
 public struct TableProxy<M: Model> {
     public subscript<C: ColumnType>(dynamicMember keyPath: WritableKeyPath<M, C>)
