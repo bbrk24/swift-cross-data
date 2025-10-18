@@ -697,6 +697,10 @@ public struct QueryWrapper<T: Model>: Sendable {
                 }
 
                 return ("%@", [value.asNSObject])
+            case .memberAccess(let instance, let memberName):
+                let (inner, args) = compile(expression: instance, forExpression: true)
+
+                return ("(\(inner)).\(memberName)", args)
             }
         }
 
@@ -831,6 +835,8 @@ public struct QueryWrapper<T: Model>: Sendable {
                 case .null:
                     return ("NULL", [])
                 }
+            case .memberAccess(instance: _, memberName: _):
+                fatalError("SQLite should not use the .memberAccess expression type")
             }
         }
 

@@ -28,6 +28,7 @@ enum SqlExpression: Sendable {
         destinationType: any ColumnType.Type
     )
     case literal(value: any ColumnType)
+    indirect case memberAccess(instance: SqlExpression, memberName: String)
 }
 
 public struct ExpressionProxy<T: ColumnType> {
@@ -302,7 +303,12 @@ extension ExpressionProxy where T == Date {
 
     public var timeIntervalSince1970: ExpressionProxy<Double> {
         #if CORE_DATA
-            fatalError("TODO")
+            return .init(
+                expression: .memberAccess(
+                    instance: self.expression,
+                    memberName: "timeIntervalSince1970"
+                )
+            )
         #else
             return .init(
                 expression: .functionCall(

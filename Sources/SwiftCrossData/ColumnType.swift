@@ -230,6 +230,9 @@
 
         public typealias ScalarType = NSDate
 
+        // not sure why this needs to be specified as it should be the default
+        public typealias NonScalarType = ScalarType
+
         public static func fromScalar(_ scalar: ScalarType) -> Date {
             scalar as Date
         }
