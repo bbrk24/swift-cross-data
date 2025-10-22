@@ -1,0 +1,9 @@
+- Decide on a license (BSD-like or MPL?)
+- Support migrations
+  - I have no idea how they work in CoreData
+- Indexes
+- `JOIN`
+  - will likely require splitting up the current `select` method into a chain of multiple methods
+- Foreign keys
+  - technically orthogonal to the previous point, even if they're usually used together
+  - blocked by indexes since SQLite requires the referenced column to be `UNIQUE` and not `rowid`
