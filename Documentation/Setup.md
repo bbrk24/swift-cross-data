@@ -32,8 +32,7 @@ Default supported column types are:
 - `Float` and `Double`
 - `Bool`
 - `String`
-- `Foundation.URL`
-- `Foundation.Data`
+- Foundation types `URL`, `Data`, `Date`, and `UUID`
 - Optionals of the above (nested optionals are not supported)
 
 ### Column Names
