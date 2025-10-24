@@ -704,10 +704,10 @@ public struct QueryWrapper<T: Model>: Sendable {
                 let (inner, args) = compile(expression: expression, isInMemory: isInMemory, forExpression: true)
 
                 if isInMemory {
-                    return ("(\(inner)).timeIntervalSince1970", args)
+                    return ("\(inner).timeIntervalSince1970", args)
                 } else {
                     return (
-                        "(\(inner)).timeIntervalSinceReferenceDate + (%@)",
+                        "(\(inner).timeIntervalSinceReferenceDate + %@)",
                         args + [Date(timeIntervalSinceReferenceDate: 0).timeIntervalSince1970 as NSNumber]
                     )
                 }
