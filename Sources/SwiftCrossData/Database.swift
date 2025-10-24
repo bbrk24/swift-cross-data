@@ -366,7 +366,7 @@ public struct Database: @unchecked Sendable {
         let expression = predicate(.init()).expression
 
         #if CORE_DATA
-            let (format, arguments) = QueryWrapper<M>.compile(expression: expression)
+            let (format, arguments) = QueryWrapper<M>.compile(expression: expression, isInMemory: isInMemory)
 
             let request = NSFetchRequest<NSFetchRequestResult>(entityName: M.getTableName())
             request.predicate = NSPredicate(format: format, argumentArray: arguments)
@@ -408,12 +408,12 @@ public struct Database: @unchecked Sendable {
         updater(&mutationProxy)
 
         #if CORE_DATA
-            let (format, arguments) = QueryWrapper<T>.compile(expression: expression)
+            let (format, arguments) = QueryWrapper<T>.compile(expression: expression, isInMemory: isInMemory)
 
             if isInMemory {
                 let propertiesToUpdate = mutationProxy.columnMap.mapValues {
                     let (exprString, setterArgs) = QueryWrapper<T>
-                        .compile(expression: $0, forExpression: true)
+                        .compile(expression: $0, isInMemory: isInMemory, forExpression: true)
 
                     return NSExpression(
                         format: exprString,
@@ -459,7 +459,7 @@ public struct Database: @unchecked Sendable {
                     }
 
                     let (exprString, setterArgs) = QueryWrapper<T>
-                        .compile(expression: expression, forExpression: true)
+                        .compile(expression: expression, isInMemory: isInMemory, forExpression: true)
 
                     request.propertiesToUpdate![columnName] = NSExpression(
                         format: exprString,
@@ -607,13 +607,14 @@ public struct QueryWrapper<T: Model>: Sendable {
     #if CORE_DATA
         static func compile(
             expression: SqlExpression,
+            isInMemory: Bool,
             forExpression: Bool = false
         ) -> (String, [NSObject]) {
             switch expression {
             case .column(let name):
                 return (forExpression ? "%K" : "(%K = TRUE)", [name as NSString])
             case .unaryOperator(let operation, let expression, let isPrefix, let isExpression):
-                let (inner, args) = compile(expression: expression, forExpression: isExpression)
+                let (inner, args) = compile(expression: expression, isInMemory: isInMemory, forExpression: isExpression)
 
                 let exprString = isPrefix ? "\(operation)\(inner)" : "\(inner)\(operation)"
 
@@ -634,10 +635,12 @@ public struct QueryWrapper<T: Model>: Sendable {
             ):
                 let (lhsInner, lhsArgs) = compile(
                     expression: lhs,
+                    isInMemory: isInMemory,
                     forExpression: childrenAreExpressions
                 )
                 let (rhsInner, rhsArgs) = compile(
                     expression: rhs,
+                    isInMemory: isInMemory,
                     forExpression: childrenAreExpressions
                 )
 
@@ -664,7 +667,7 @@ public struct QueryWrapper<T: Model>: Sendable {
                         output += ", "
                     }
 
-                    let (innerPred, innerArgs) = compile(expression: argument, forExpression: true)
+                    let (innerPred, innerArgs) = compile(expression: argument, isInMemory: isInMemory, forExpression: true)
                     output += innerPred
                     varargs += innerArgs
                 }
@@ -673,10 +676,10 @@ public struct QueryWrapper<T: Model>: Sendable {
                 return (forExpression ? output : "(\(output) = TRUE)", varargs)
             case .cast(let expression, let sourceType, let destinationType):
                 if sourceType.nsObjectType == destinationType.nsObjectType {
-                    return compile(expression: expression, forExpression: forExpression)
+                    return compile(expression: expression, isInMemory: isInMemory, forExpression: forExpression)
                 }
 
-                let (inner, innerArgs) = compile(expression: expression, forExpression: true)
+                let (inner, innerArgs) = compile(expression: expression, isInMemory: isInMemory, forExpression: true)
 
                 let output = "CAST(\(inner), %@)"
 
@@ -697,15 +700,22 @@ public struct QueryWrapper<T: Model>: Sendable {
                 }
 
                 return ("%@", [value.asNSObject])
-            case .memberAccess(let instance, let memberName):
-                let (inner, args) = compile(expression: instance, forExpression: true)
+            case .timeIntervalSince1970(let expression):
+                let (inner, args) = compile(expression: expression, isInMemory: isInMemory, forExpression: true)
 
-                return ("(\(inner)).\(memberName)", args)
+                if isInMemory {
+                    return ("(\(inner)).timeIntervalSince1970", args)
+                } else {
+                    return (
+                        "(\(inner)).timeIntervalSinceReferenceDate + (%@)",
+                        args + [Date(timeIntervalSinceReferenceDate: 0).timeIntervalSince1970 as NSNumber]
+                    )
+                }
             }
         }
 
         public func count() async throws -> Int64 {
-            let (format, arguments) = Self.compile(expression: self.expression)
+            let (format, arguments) = Self.compile(expression: self.expression, isInMemory: db.isInMemory)
 
             let request = NSFetchRequest<T.ManagedObjectType>(entityName: T.getTableName())
             request.predicate = NSPredicate(format: format, argumentArray: arguments)
@@ -725,7 +735,7 @@ public struct QueryWrapper<T: Model>: Sendable {
         public func collect<C: RangeReplaceableCollection<T> & Sendable>(
             as _: C.Type
         ) async throws -> C {
-            let (format, arguments) = Self.compile(expression: self.expression)
+            let (format, arguments) = Self.compile(expression: self.expression, isInMemory: db.isInMemory)
 
             let request = NSFetchRequest<T.ManagedObjectType>(entityName: T.getTableName())
             request.predicate = NSPredicate(format: format, argumentArray: arguments)
@@ -756,7 +766,7 @@ public struct QueryWrapper<T: Model>: Sendable {
         }
 
         public func any() async throws -> Bool {
-            let (format, arguments) = Self.compile(expression: self.expression)
+            let (format, arguments) = Self.compile(expression: self.expression, isInMemory: db.isInMemory)
 
             let request = NSFetchRequest<T.ManagedObjectType>(entityName: T.getTableName())
             request.predicate = NSPredicate(format: format, argumentArray: arguments)
@@ -835,8 +845,8 @@ public struct QueryWrapper<T: Model>: Sendable {
                 case .null:
                     return ("NULL", [])
                 }
-            case .memberAccess(instance: _, memberName: _):
-                fatalError("SQLite should not use the .memberAccess expression type")
+            case .timeIntervalSince1970(_):
+                fatalError("SQLite should not use the .timeIntervalSince1970 expression type")
             }
         }
 

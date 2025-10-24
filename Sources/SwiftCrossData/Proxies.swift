@@ -28,7 +28,8 @@ enum SqlExpression: Sendable {
         destinationType: any ColumnType.Type
     )
     case literal(value: any ColumnType)
-    indirect case memberAccess(instance: SqlExpression, memberName: String)
+    /// This case needs special handling due to CoreData nonsense.
+    indirect case timeIntervalSince1970(SqlExpression)
 }
 
 public struct ExpressionProxy<T: ColumnType> {
@@ -303,12 +304,7 @@ extension ExpressionProxy where T == Date {
 
     public var timeIntervalSince1970: ExpressionProxy<Double> {
         #if CORE_DATA
-            return .init(
-                expression: .memberAccess(
-                    instance: self.expression,
-                    memberName: "timeIntervalSince1970"
-                )
-            )
+            return .init(expression: .timeIntervalSince1970(self.expression))
         #else
             return .init(
                 expression: .functionCall(
