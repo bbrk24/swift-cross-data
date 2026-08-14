@@ -5,6 +5,7 @@
         func performAsync<T: Sendable, E: Error>(
             _ body: sending @escaping () throws(E) -> T
         ) async throws(E) -> T {
+            nonisolated(unsafe) let body = body
             do {
                 return try await withCheckedThrowingContinuation { continuation in
                     self.perform {
