@@ -1,4 +1,4 @@
-// swift-tools-version: 6.0
+// swift-tools-version: 6.1
 
 import PackageDescription
 import CompilerPluginSupport
@@ -42,7 +42,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.0-latest"),
+        .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "601.0.0-latest"),
         .package(
             url: "https://github.com/stackotter/swift-macro-toolkit.git",
             .upToNextMinor(from: "0.9.0")
