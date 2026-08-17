@@ -1,5 +1,5 @@
 {
-  "originHash" : "902a26d06e6cd6fb2e68111e727fe0c9861d876bc9237bb7b6e107d306c8ff38",
+  "originHash" : "79d3ea373817e2f3b242579c2f48f320bdf1c1142c8ab81e62e57473c038ee88",
   "pins" : [
     {
       "identity" : "sqlite.swift",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/stackotter/swift-macro-toolkit.git",
       "state" : {
-        "revision" : "569627091e1fbb8745d691aeeb008e7247dedb7c",
-        "version" : "0.6.1"
+        "revision" : "d6ed555bb83c9f21a292e9769952e8f52610a6e2",
+        "version" : "0.9.0"
       }
     },
     {
